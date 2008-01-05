@@ -20,7 +20,7 @@ FORMS +=	beamercontrol.ui \
 			configuredmx.ui \
 			lightbars.ui \
 			lightfader.ui \
-			lightpreset.ui \
+			lightpresets.ui \
 			mediacenter.ui \
 			preset.ui
 			
