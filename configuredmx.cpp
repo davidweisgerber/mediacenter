@@ -1,0 +1,96 @@
+#include "configuredmx.h"
+
+ConfigureDMX::ConfigureDMX(QWidget *parent)
+	: QDialog(parent)
+{
+	ui.setupUi(this);
+	settings = new QSettings( QSettings::SystemScope, "FEGMM", "mediacenter" );
+	
+	int num_faders = settings->value( "faders", 0 ).toInt();
+
+	for( int i=0; i < num_faders; i++ ) {
+		settings->beginGroup( "fader" + QString::number(i) );
+		int channel = settings->value( "channel", 0 ).toInt();
+		int defStrength = settings->value( "strength", 0 ).toInt();
+		QString name = settings->value( "name", "" ).toString();
+
+		ui.listWidget->addItem( QString::number( channel ) + " (" + name + ")" );
+
+		settings->endGroup();
+	}
+
+	if( ui.listWidget->count() > 0 ) {
+		setItem( ui.listWidget->item( 0 ) );
+		ui.listWidget->setCurrentRow( 0 );
+	}
+
+	connect( ui.listWidget, SIGNAL( currentItemChanged ( QListWidgetItem *, QListWidgetItem * ) ), this,
+		SLOT( currentItemChanged ( QListWidgetItem *, QListWidgetItem * ) ) );
+	connect( ui.addButton, SIGNAL( clicked() ), this, SLOT( addChannel() ) );
+	connect( ui.okButton, SIGNAL( clicked() ), this, SLOT( okClicked() ) );
+}
+
+ConfigureDMX::~ConfigureDMX()
+{
+
+}
+
+void ConfigureDMX::addChannel() {
+
+	ui.listWidget->addItem( tr("New channel") );
+	ui.listWidget->setCurrentRow( ui.listWidget->count() - 1 );
+
+	ui.channelSpinBox->setValue( 0 );
+	ui.name->setText( tr("New channel") );
+	ui.defaultSpinBox->setValue( 0 );
+
+	settings->setValue( "faders", ui.listWidget->count() );
+}
+
+void ConfigureDMX::currentItemChanged( QListWidgetItem * current, QListWidgetItem * previous ) {
+	if( previous ) {
+		saveItem( previous );
+	}
+
+	if( current ) {
+		if( current->text() != tr("New channel") ) {
+			setItem( current );
+		}
+	}
+}
+
+void ConfigureDMX::saveItem( QListWidgetItem *item ) {
+	int num = ui.listWidget->row(item);
+
+	settings->beginGroup( "fader" + QString::number(num) );
+	settings->setValue( "channel", ui.channelSpinBox->value() );
+	settings->setValue( "strength", ui.defaultSpinBox->value() );
+	settings->setValue( "name", ui.name->text() );
+	settings->endGroup();
+
+	item->setText( QString::number( ui.channelSpinBox->value() ) + " (" + ui.name->text() + ")" );
+}
+
+void ConfigureDMX::setItem( const QListWidgetItem *item ) {
+	int num = ui.listWidget->row(item);
+
+	settings->beginGroup( "fader" + QString::number(num) );
+
+	ui.channelSpinBox->setValue( settings->value( "channel", 0 ).toInt() );
+	ui.name->setText( settings->value( "name", "" ).toString() );
+	ui.defaultSpinBox->setValue( settings->value( "strength", 0 ).toInt() );
+
+	settings->endGroup();
+}
+
+void ConfigureDMX::okClicked() {
+	QListWidgetItem *current = ui.listWidget->currentItem();
+
+	if( current ) {
+		saveItem( current );
+	}
+
+	hide();
+	emit configured();
+}
+

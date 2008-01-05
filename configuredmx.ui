@@ -1,0 +1,152 @@
+<ui version="4.0" >
+ <class>ConfigureDMXClass</class>
+ <widget class="QDialog" name="ConfigureDMXClass" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>549</width>
+    <height>191</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Configure DMX Channels</string>
+  </property>
+  <widget class="QLabel" name="label" >
+   <property name="geometry" >
+    <rect>
+     <x>200</x>
+     <y>20</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Channel</string>
+   </property>
+   <property name="alignment" >
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2" >
+   <property name="geometry" >
+    <rect>
+     <x>200</x>
+     <y>50</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Name</string>
+   </property>
+   <property name="alignment" >
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3" >
+   <property name="geometry" >
+    <rect>
+     <x>200</x>
+     <y>80</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Default Strength</string>
+   </property>
+   <property name="alignment" >
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="channelSpinBox" >
+   <property name="geometry" >
+    <rect>
+     <x>320</x>
+     <y>20</y>
+     <width>91</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="maximum" >
+    <number>511</number>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="name" >
+   <property name="geometry" >
+    <rect>
+     <x>320</x>
+     <y>50</y>
+     <width>181</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="defaultSpinBox" >
+   <property name="geometry" >
+    <rect>
+     <x>320</x>
+     <y>80</y>
+     <width>46</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="maximum" >
+    <number>100</number>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="deleteButton" >
+   <property name="geometry" >
+    <rect>
+     <x>220</x>
+     <y>150</y>
+     <width>91</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Delete Channel</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="addButton" >
+   <property name="geometry" >
+    <rect>
+     <x>220</x>
+     <y>120</y>
+     <width>91</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Add Channel</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="okButton" >
+   <property name="geometry" >
+    <rect>
+     <x>460</x>
+     <y>150</y>
+     <width>75</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>OK</string>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="listWidget" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>171</width>
+     <height>171</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <resources/>
+ <connections/>
+</ui>
