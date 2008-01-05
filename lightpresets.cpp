@@ -1,6 +1,7 @@
 #include "lightpresets.h"
 #include "preset.h"
 #include <cmath>
+#include <QSettings>
 
 
 LightPresets::LightPresets(LightBars *bars, QWidget *parent)
@@ -31,11 +32,13 @@ LightPresets::LightPresets(LightBars *bars, QWidget *parent)
 	connect( ui.deleteButton, SIGNAL( clicked() ), this, SLOT( deletePreset() ) );
 	connect( ui.blackButton, SIGNAL( clicked() ), this, SLOT( setBlack() ) );
 	connect( ui.fullPowerButton, SIGNAL( clicked() ), this, SLOT( setFull() ) );
+
+	restorePresets();
 }
 
 LightPresets::~LightPresets()
 {
-
+	savePresets();
 }
 
 void LightPresets::newPreset() {
@@ -50,6 +53,8 @@ void LightPresets::newPreset() {
 	m_current = p;
 	p->setActivated( true );
 	p->setValues( m_bars->getStatus() );
+
+	savePresets();
 }
 
 void LightPresets::overwritePreset() {
@@ -58,6 +63,8 @@ void LightPresets::overwritePreset() {
 	}
 
 	m_current->setValues( m_bars->getStatus() );
+
+	savePresets();
 }
 
 void LightPresets::setBlack() {
@@ -98,6 +105,8 @@ void LightPresets::deletePreset() {
 		Preset *cur = (Preset*)layout->itemAt(i)->widget();
 		cur->setNumber( i+1 );
 	}
+
+	savePresets();
 }
 
 void LightPresets::timerChanged( int time ) {
@@ -128,4 +137,53 @@ void LightPresets::showToggle() {
 
 int LightPresets::getMaster() {
 	return ui.masterSlider->value();
+}
+
+void LightPresets::savePresets() {
+	QSettings settings( QSettings::UserScope, "FEGMM", "mediacenter" );
+	settings.setValue( "presets", layout->count() );
+
+	for( int i=0; i < layout->count(); i++ ) {
+		settings.beginGroup( "preset" + QString::number( i ) );
+		Preset *cur = (Preset*)layout->itemAt(i)->widget();
+		settings.setValue( "title", cur->getTitle() );
+		settings.setValue( "comment", cur->getComment() );
+		
+		QMap<int, int> values = cur->getValues();
+		QList<int> channels = values.uniqueKeys();
+		for (int i=0; i < channels.size(); ++i) {
+			settings.setValue( QString::number( channels.at(i) ),
+				values.value(channels.at(i), 0) );
+		}
+		
+		settings.endGroup();
+	}
+}
+
+void LightPresets::restorePresets() {
+	QSettings settings( QSettings::UserScope, "FEGMM", "mediacenter" );
+	int presets = settings.value( "presets", 0 ).toInt();
+	
+	for( int i=0; i < presets; i++ ) {
+		settings.beginGroup( "preset" + QString::number( i ) );
+		Preset *p = new Preset( layout->count() + 1, sarea->widget() );
+		layout->addWidget( p );
+		connect( p, SIGNAL( activated() ), this, SLOT( presetActivated() ) );
+
+		p->setTitle( settings.value( "title" ).toString() );
+		p->setComment( settings.value( "comment" ).toString() );
+
+		QMap<int, int> values;
+		QStringList keys = settings.childKeys();
+		for (int j = 0; j < keys.size(); ++j) {
+			bool ok;
+			int key = keys.at(j).toInt(&ok);
+			if( ok ) {
+				values.insert( key, settings.value( keys.at(j), 0 ).toInt() );
+			}
+		}
+
+		p->setValues( values );
+		settings.endGroup();
+	}
 }

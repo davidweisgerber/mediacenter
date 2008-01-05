@@ -16,6 +16,7 @@ public:
 
 private slots:
 	void addChannel();
+	void deleteChannel();
 	void currentItemChanged ( QListWidgetItem * current, QListWidgetItem * previous );
 	void saveItem( QListWidgetItem *item );
 	void setItem( const QListWidgetItem *item );
@@ -25,6 +26,7 @@ signals:
 	void configured();
 
 private:
+	bool deleteProc;
 	QSettings *settings;
 	Ui::ConfigureDMXClass ui;
 };

@@ -134,6 +134,7 @@ void mediacenter::connectDMX() {
 	dmxStatus = tr("DMX connected");
 	systray->showMessage( tr("DMX Connected!"), tr("You can control the light now."), QSystemTrayIcon::Information, 5000 );
 	setSystrayToolTip();
+	systray->setIcon( QIcon( on_xpm ) );
 }
 
 void mediacenter::disconnectDMX() {
@@ -146,6 +147,7 @@ void mediacenter::disconnectDMX() {
 	dmxStatus = tr("DMX disconnected");
 	systray->showMessage( tr("DMX Disconnected!"), tr("Controls have been turned off."), QSystemTrayIcon::Information, 5000 );
 	setSystrayToolTip();
+	systray->setIcon( QIcon( off_xpm ) );
 }
 
 void mediacenter::sendDMX() {

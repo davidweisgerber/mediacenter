@@ -3,6 +3,7 @@
 ConfigureDMX::ConfigureDMX(QWidget *parent)
 	: QDialog(parent)
 {
+	deleteProc = false;
 	ui.setupUi(this);
 	settings = new QSettings( QSettings::SystemScope, "FEGMM", "mediacenter" );
 	
@@ -27,6 +28,7 @@ ConfigureDMX::ConfigureDMX(QWidget *parent)
 	connect( ui.listWidget, SIGNAL( currentItemChanged ( QListWidgetItem *, QListWidgetItem * ) ), this,
 		SLOT( currentItemChanged ( QListWidgetItem *, QListWidgetItem * ) ) );
 	connect( ui.addButton, SIGNAL( clicked() ), this, SLOT( addChannel() ) );
+	connect( ui.deleteButton, SIGNAL( clicked() ), this, SLOT( deleteChannel() ) );
 	connect( ui.okButton, SIGNAL( clicked() ), this, SLOT( okClicked() ) );
 }
 
@@ -48,6 +50,9 @@ void ConfigureDMX::addChannel() {
 }
 
 void ConfigureDMX::currentItemChanged( QListWidgetItem * current, QListWidgetItem * previous ) {
+	if( deleteProc ) {
+		return;
+	}
 	if( previous ) {
 		saveItem( previous );
 	}
@@ -94,3 +99,33 @@ void ConfigureDMX::okClicked() {
 	emit configured();
 }
 
+
+void ConfigureDMX::deleteChannel() {
+	QListWidgetItem *current = ui.listWidget->currentItem();
+
+	if( !current ) {
+		return;
+	}
+
+	int num = ui.listWidget->row( current );
+	delete current;
+
+	for( int i=num; i < ui.listWidget->count(); i++ ) {
+		settings->beginGroup( "fader" + QString::number(i+1) );
+
+		ui.channelSpinBox->setValue( settings->value( "channel", 0 ).toInt() );
+		ui.name->setText( settings->value( "name", "" ).toString() );
+		ui.defaultSpinBox->setValue( settings->value( "strength", 0 ).toInt() );
+
+		settings->endGroup();
+
+		saveItem( ui.listWidget->item( i ) );
+	}
+
+	deleteProc = true;
+	ui.listWidget->setCurrentRow( 0 );
+	setItem( ui.listWidget->item( 0 ) );
+	deleteProc = false;
+
+	settings->setValue( "faders", ui.listWidget->count() );
+}

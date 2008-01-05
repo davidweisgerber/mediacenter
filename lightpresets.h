@@ -20,6 +20,7 @@ public:
 
 public slots:
 	void showToggle();
+	void savePresets();
 
 private slots:
 	void timerChanged( int time );
@@ -32,6 +33,7 @@ private slots:
 	void setFull();
 
 private:
+	void restorePresets();
 	Ui::LightPresetsClass ui;
 	double timerValue;
 	QHBoxLayout *layout;
