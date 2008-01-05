@@ -3,10 +3,11 @@
 
 #include <QMainWindow>
 #include "ui_mediacenter.h"
-
 #include "lightbars.h"
 #include "lightpresets.h"
 #include "beamercontrol.h"
+#include <windows.h>
+#include "FTD2XX.h"
 
 class QSystemTrayIcon;
 class ConfigureDMX;
@@ -24,6 +25,7 @@ private slots:
 	void hideAllControls();
 	void connectDMX();
 	void disconnectDMX();
+	void sendDMX();
 
 private:
 	void setSystrayToolTip();
@@ -33,6 +35,9 @@ private:
 	BeamerControl *bcontrol;
 	ConfigureDMX *configDMX;
 	QSystemTrayIcon *systray;
+
+	bool dmxConnected;
+	FT_HANDLE ftHandle;
 
 	QString dmxStatus;
 	QString beamerStatus;

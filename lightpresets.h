@@ -16,6 +16,7 @@ class LightPresets : public QMainWindow
 public:
 	LightPresets(LightBars *bars, QWidget *parent = 0);
 	~LightPresets();
+	int getMaster();
 
 public slots:
 	void showToggle();

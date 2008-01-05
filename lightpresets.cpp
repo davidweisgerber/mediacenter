@@ -125,3 +125,7 @@ void LightPresets::presetActivated() {
 void LightPresets::showToggle() {
 	setVisible( !isVisible() );
 }
+
+int LightPresets::getMaster() {
+	return ui.masterSlider->value();
+}
