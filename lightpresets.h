@@ -6,8 +6,10 @@
 #include <QScrollArea>
 #include "ui_lightpresets.h"
 #include "lightbars.h"
+#include <QTime>
 
 class Preset;
+class QTimer;
 
 class LightPresets : public QMainWindow
 {
@@ -31,6 +33,7 @@ private slots:
 	void deletePreset();
 	void setBlack();
 	void setFull();
+	void presetStep();
 
 private:
 	void restorePresets();
@@ -40,6 +43,8 @@ private:
 	LightBars *m_bars;
 	QScrollArea *sarea;
 	Preset *m_current;
+	QTime m_fadeCounter;
+	QMap<int, int> m_fadeStart, m_fadeEnd;
 };
 
 #endif // LIGHTPRESETS_H

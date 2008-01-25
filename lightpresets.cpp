@@ -2,6 +2,8 @@
 #include "preset.h"
 #include <cmath>
 #include <QSettings>
+#include <QTimer>
+#include <QMessageBox>
 
 
 LightPresets::LightPresets(LightBars *bars, QWidget *parent)
@@ -128,7 +130,28 @@ void LightPresets::presetActivated() {
 		}
 	}
 	m_current = p;
-	m_bars->setStatus( p->getValues() );
+	m_fadeStart = m_bars->getStatus();
+	m_fadeEnd = p->getValues();
+	m_fadeCounter.start();
+	presetStep();
+}
+
+void LightPresets::presetStep() {
+	QMap<int, int> status;
+	QList<int> channels = m_fadeEnd.uniqueKeys();
+	for (int i=0; i < channels.size(); ++i) {
+		status[channels.at(i)] = m_fadeStart[channels.at(i)] +
+			(double)( m_fadeEnd[channels.at(i)] - m_fadeStart[channels.at(i)] ) *
+			(double)( (double)m_fadeCounter.elapsed() / (double)(timerValue * 1000) );
+	}
+
+	m_bars->setStatus( status );
+
+	if( m_fadeCounter.elapsed() < timerValue * 1000.0 ) {
+		QTimer::singleShot( 25, this, SLOT( presetStep() ) );
+	} else {
+		m_bars->setStatus( m_fadeEnd );
+	}
 }
 
 void LightPresets::showToggle() {
