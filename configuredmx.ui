@@ -99,7 +99,7 @@
   <widget class="QPushButton" name="deleteButton" >
    <property name="geometry" >
     <rect>
-     <x>220</x>
+     <x>340</x>
      <y>150</y>
      <width>91</width>
      <height>24</height>
@@ -107,19 +107,6 @@
    </property>
    <property name="text" >
     <string>Delete Channel</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="addButton" >
-   <property name="geometry" >
-    <rect>
-     <x>220</x>
-     <y>120</y>
-     <width>91</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text" >
-    <string>Add Channel</string>
    </property>
   </widget>
   <widget class="QPushButton" name="okButton" >
@@ -143,6 +130,45 @@
      <width>171</width>
      <height>171</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="addButton" >
+   <property name="geometry" >
+    <rect>
+     <x>340</x>
+     <y>120</y>
+     <width>91</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Add Channel</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="upButton" >
+   <property name="geometry" >
+    <rect>
+     <x>200</x>
+     <y>120</y>
+     <width>81</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Move Up</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="downButton" >
+   <property name="geometry" >
+    <rect>
+     <x>200</x>
+     <y>150</y>
+     <width>81</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Move Down</string>
    </property>
   </widget>
  </widget>

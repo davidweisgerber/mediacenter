@@ -12,7 +12,6 @@ ConfigureDMX::ConfigureDMX(QWidget *parent)
 	for( int i=0; i < num_faders; i++ ) {
 		settings->beginGroup( "fader" + QString::number(i) );
 		int channel = settings->value( "channel", 0 ).toInt();
-		int defStrength = settings->value( "strength", 0 ).toInt();
 		QString name = settings->value( "name", "" ).toString();
 
 		ui.listWidget->addItem( QString::number( channel ) + " (" + name + ")" );
@@ -30,6 +29,8 @@ ConfigureDMX::ConfigureDMX(QWidget *parent)
 	connect( ui.addButton, SIGNAL( clicked() ), this, SLOT( addChannel() ) );
 	connect( ui.deleteButton, SIGNAL( clicked() ), this, SLOT( deleteChannel() ) );
 	connect( ui.okButton, SIGNAL( clicked() ), this, SLOT( okClicked() ) );
+	connect( ui.upButton, SIGNAL( clicked() ), this, SLOT( moveChannelUp() ) );
+	connect( ui.downButton, SIGNAL( clicked() ), this, SLOT( moveChannelDown() ) );
 }
 
 ConfigureDMX::~ConfigureDMX()
@@ -128,4 +129,94 @@ void ConfigureDMX::deleteChannel() {
 	deleteProc = false;
 
 	settings->setValue( "faders", ui.listWidget->count() );
+}
+
+void ConfigureDMX::moveChannelUp() {
+	QListWidgetItem *current = ui.listWidget->currentItem();
+
+	if( !current ) {
+		return;
+	}
+
+	int num = ui.listWidget->row( current );
+	if( num == 0 ) {
+		return;
+	}
+
+	int tempChannel;
+	QString tempText;
+	int tempDefault;
+
+	settings->beginGroup( "fader" + QString::number(num-1) );
+
+	tempChannel = settings->value( "channel", 0 ).toInt();
+	tempText = settings->value( "name", "" ).toString();
+	tempDefault = settings->value( "strength", 0 ).toInt();
+
+	settings->setValue( "channel", ui.channelSpinBox->value() );
+	settings->setValue( "strength", ui.defaultSpinBox->value() );
+	settings->setValue( "name", ui.name->text() );
+
+	settings->endGroup();
+
+	settings->beginGroup( "fader" + QString::number(num) );
+	
+	settings->setValue( "channel", tempChannel );
+	settings->setValue( "strength", tempDefault );
+	settings->setValue( "name", tempText );
+
+	settings->endGroup();
+
+	ui.listWidget->item( num - 1 )->setText( current->text() );
+	current->setText( QString::number( tempChannel ) + " (" + tempText + ")" );
+
+	deleteProc = true;
+	ui.listWidget->setCurrentRow( num-1 );
+	setItem( ui.listWidget->item( num-1 ) );
+	deleteProc = false;
+}
+
+void ConfigureDMX::moveChannelDown() {
+	QListWidgetItem *current = ui.listWidget->currentItem();
+
+	if( !current ) {
+		return;
+	}
+
+	int num = ui.listWidget->row( current );
+	if( num >= ( ui.listWidget->count() - 1 ) ) {
+		return;
+	}
+
+	int tempChannel;
+	QString tempText;
+	int tempDefault;
+
+	settings->beginGroup( "fader" + QString::number(num+1) );
+
+	tempChannel = settings->value( "channel", 0 ).toInt();
+	tempText = settings->value( "name", "" ).toString();
+	tempDefault = settings->value( "strength", 0 ).toInt();
+
+	settings->setValue( "channel", ui.channelSpinBox->value() );
+	settings->setValue( "strength", ui.defaultSpinBox->value() );
+	settings->setValue( "name", ui.name->text() );
+
+	settings->endGroup();
+
+	settings->beginGroup( "fader" + QString::number(num) );
+	
+	settings->setValue( "channel", tempChannel );
+	settings->setValue( "strength", tempDefault );
+	settings->setValue( "name", tempText );
+
+	settings->endGroup();
+
+	ui.listWidget->item( num + 1 )->setText( current->text() );
+	current->setText( QString::number( tempChannel ) + " (" + tempText + ")" );
+
+	deleteProc = true;
+	ui.listWidget->setCurrentRow( num+1 );
+	setItem( ui.listWidget->item( num+1 ) );
+	deleteProc = false;
 }

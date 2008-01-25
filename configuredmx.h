@@ -21,6 +21,8 @@ private slots:
 	void saveItem( QListWidgetItem *item );
 	void setItem( const QListWidgetItem *item );
 	void okClicked();
+	void moveChannelUp();
+	void moveChannelDown();
 
 signals:
 	void configured();
