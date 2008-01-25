@@ -165,6 +165,7 @@ int LightPresets::getMaster() {
 void LightPresets::savePresets() {
 	QSettings settings( QSettings::UserScope, "FEGMM", "mediacenter" );
 	settings.setValue( "presets", layout->count() );
+	settings.setValue( "autofader", ui.masterDial->value() );
 
 	for( int i=0; i < layout->count(); i++ ) {
 		settings.beginGroup( "preset" + QString::number( i ) );
@@ -186,6 +187,8 @@ void LightPresets::savePresets() {
 void LightPresets::restorePresets() {
 	QSettings settings( QSettings::UserScope, "FEGMM", "mediacenter" );
 	int presets = settings.value( "presets", 0 ).toInt();
+	timerChanged( settings.value( "autofader", 0 ).toInt() );
+	ui.masterDial->setValue( settings.value( "autofader", 0 ).toInt() );
 	
 	for( int i=0; i < presets; i++ ) {
 		settings.beginGroup( "preset" + QString::number( i ) );
