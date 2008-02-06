@@ -6,6 +6,7 @@
 #include <QDesktopWidget>
 #include <QMessageBox>
 #include <QTimer>
+#include <QMenu>
 #include "configuredmx.h"
 
 

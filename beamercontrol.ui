@@ -1,27 +1,138 @@
-<UI version="4.0" stdSetDef="1" >
+<ui version="4.0" >
  <class>BeamerControlClass</class>
  <widget class="QMainWindow" name="BeamerControlClass" >
-  <property name="objectName" >
-   <cstring>BeamerControlClass</cstring>
-  </property>
   <property name="geometry" >
    <rect>
-	<x>0</x>
-	<y>0</y>
-	<width>400</width>
-	<height>300</height>
+    <x>0</x>
+    <y>0</y>
+    <width>249</width>
+    <height>171</height>
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>BeamerControl</string>
+   <string>Beamer Controls</string>
   </property>
-  <widget class="QMenuBar" name="menuBar" />
-  <widget class="QToolBar" name="mainToolBar" />
-  <widget class="QWidget" name="centralWidget" />
-  <widget class="QStatusBar" name="statusBar" />  
+  <widget class="QWidget" name="centralWidget" >
+   <widget class="QPushButton" name="input1Button" >
+    <property name="geometry" >
+     <rect>
+      <x>150</x>
+      <y>10</y>
+      <width>75</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Input 1</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="input2Button" >
+    <property name="geometry" >
+     <rect>
+      <x>150</x>
+      <y>30</y>
+      <width>75</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Input 2</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="input3Button" >
+    <property name="geometry" >
+     <rect>
+      <x>150</x>
+      <y>50</y>
+      <width>75</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Input 3</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="input4Button" >
+    <property name="geometry" >
+     <rect>
+      <x>150</x>
+      <y>70</y>
+      <width>75</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Input 4</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="offButton" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>75</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Power Off</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="onButton" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>75</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Power On</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="statusLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>110</y>
+      <width>201</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Status</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="temperatureLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>130</y>
+      <width>201</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Temperatur</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lampLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>150</y>
+      <width>201</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Lamp Life Time</string>
+    </property>
+   </widget>
+  </widget>
  </widget>
- <layoutDefault spacing="6" margin="11" />
- <pixmapfunction></pixmapfunction>
+ <layoutdefault spacing="6" margin="11" />
  <resources/>
  <connections/>
-</UI>
+</ui>

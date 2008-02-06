@@ -33,3 +33,7 @@ CONFIG +=	release \
 TEMPLATE = vcapp
 LIBPATH += C:\d2xx
 LIBS += FTD2XX.lib
+INCLUDEPATH += ../qextserialport/
+QMAKE_LIBDIR += ../qextserialport/build
+LIBS += -lqextserialport
+win32:DEFINES  = _TTY_WIN_ QWT_DLL QT_DLL

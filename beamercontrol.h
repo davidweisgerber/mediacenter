@@ -2,6 +2,7 @@
 #define BEAMERCONTROL_H
 
 #include <QMainWindow>
+#include <QExtSerialPort.h>
 #include "ui_beamercontrol.h"
 
 class BeamerControl : public QMainWindow
@@ -14,6 +15,7 @@ public:
 
 private:
 	Ui::BeamerControlClass ui;
+	QextSerialPort *m_serial;
 };
 
 #endif // BEAMERCONTROL_H
