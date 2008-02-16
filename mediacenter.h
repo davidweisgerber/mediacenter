@@ -26,9 +26,10 @@ private slots:
 	void connectDMX();
 	void disconnectDMX();
 	void sendDMX();
+	void setSystrayToolTip();
+	void beamerStateChange( QString state );
 
 private:
-	void setSystrayToolTip();
 	Ui::mediacenterClass ui;
 	LightBars *lbars;
 	LightPresets *lpresets;

@@ -21,6 +21,8 @@ mediacenter::mediacenter(QWidget *parent, Qt::WFlags flags)
 	lpresets->show();
 
 	bcontrol = new BeamerControl( this );
+	connect( bcontrol, SIGNAL( stateChanged( QString ) ), this, SLOT( beamerStateChange( QString ) ) );
+	connect( bcontrol, SIGNAL( updateStatus() ), this, SLOT( setSystrayToolTip() ) );
 	//bcontrol->show();
 
 	configDMX = new ConfigureDMX( this );
@@ -55,7 +57,6 @@ mediacenter::mediacenter(QWidget *parent, Qt::WFlags flags)
 	systray->setContextMenu( menu );
 
 	dmxStatus = tr("DMX disconnected");
-	beamerStatus = tr("Beamer disconnected");
 	setSystrayToolTip();
 
 	QTimer *timer = new QTimer( this );
@@ -64,7 +65,7 @@ mediacenter::mediacenter(QWidget *parent, Qt::WFlags flags)
 }
 
 void mediacenter::setSystrayToolTip() {
-	systray->setToolTip( "Media Control Status\n\n" + dmxStatus + "\n" + beamerStatus );
+	systray->setToolTip( dmxStatus + "\n\nBeamer: " + bcontrol->getStatus() );
 }
 
 mediacenter::~mediacenter()
@@ -173,4 +174,9 @@ void mediacenter::sendDMX() {
     FT_W32_ClearCommBreak(ftHandle);
 	FT_W32_WriteFile(ftHandle, &StartCode, 1, &bytesWritten, NULL);
     FT_W32_WriteFile(ftHandle, DMXData, 512, &bytesWritten, NULL);
+}
+
+
+void mediacenter::beamerStateChange( QString state ) {
+	systray->showMessage( tr("Beamer Information"), state, QSystemTrayIcon::Information, 5000 );
 }
