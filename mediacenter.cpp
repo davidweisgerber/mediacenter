@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QMessageBox>
+#include <QInputDialog>
 #include <QTimer>
 #include <QMenu>
 #include "configuredmx.h"
@@ -23,7 +24,7 @@ mediacenter::mediacenter(QWidget *parent, Qt::WFlags flags)
 	bcontrol = new BeamerControl( this );
 	connect( bcontrol, SIGNAL( stateChanged( QString ) ), this, SLOT( beamerStateChange( QString ) ) );
 	connect( bcontrol, SIGNAL( updateStatus() ), this, SLOT( setSystrayToolTip() ) );
-	//bcontrol->show();
+	bcontrol->show();
 
 	configDMX = new ConfigureDMX( this );
 	configDMX->setWindowIcon( QIcon( on_xpm ) );
@@ -33,6 +34,8 @@ mediacenter::mediacenter(QWidget *parent, Qt::WFlags flags)
 	QRect geo = qApp->desktop()->availableGeometry();
 	lbars->move( geo.width() - lbars->geometry().size().width() - 6, geo.y() );
 	lpresets->move( lbars->geometry().x() - lpresets->geometry().width() - 9, geo.y() );
+	bcontrol->move( lbars->geometry().x() - bcontrol->geometry().width() - 9,
+		lpresets->geometry().y() + lpresets->geometry().height() + 3);
 
 	hide();
 
@@ -51,6 +54,7 @@ mediacenter::mediacenter(QWidget *parent, Qt::WFlags flags)
 	menu->addAction( tr("Show/Hide Beamer Control"), bcontrol, SLOT( showToggle() ) );
 	menu->addSeparator();
 	menu->addAction( tr("Configure DMX Channels"), configDMX, SLOT( show() ) );
+	menu->addAction( tr("Configure Beamer Connection"), this, SLOT( configureBeamer() ) );
 	menu->addSeparator();
 	menu->addAction( tr("Close"), qApp, SLOT(quit()) );
 	
@@ -179,4 +183,32 @@ void mediacenter::sendDMX() {
 
 void mediacenter::beamerStateChange( QString state ) {
 	systray->showMessage( tr("Beamer Information"), state, QSystemTrayIcon::Information, 5000 );
+}
+
+void mediacenter::configureBeamer() {
+	int current = 2;
+	bool ok;
+
+	QSettings settings( QSettings::SystemScope, "FEGMM", "mediacenter" );
+	QString port = settings.value( "beamerport", "COM3" ).toString();
+
+	if( port == "COM1" ) {
+		current = 0;
+	} else if( port == "COM2" ) {
+		current = 1;
+	} else if( port == "COM3" ) {
+		current = 2;
+	} else if( port == "COM4" ) {
+		current = 3;
+	} else if( port == "COM5" ) {
+		current = 4;
+	}
+
+	QString comPort = QInputDialog::getItem( this, tr("Select COM Port"), tr("Beamer Port: "),
+		QStringList() << "COM1" << "COM2" << "COM3" << "COM4" << "COM5", current, false, &ok );
+
+	if( ok ) {
+		settings.setValue( "beamerport", comPort );
+		bcontrol->initialize();
+	}
 }

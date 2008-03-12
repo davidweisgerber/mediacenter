@@ -28,6 +28,7 @@ private slots:
 	void sendDMX();
 	void setSystrayToolTip();
 	void beamerStateChange( QString state );
+	void configureBeamer();
 
 private:
 	Ui::mediacenterClass ui;

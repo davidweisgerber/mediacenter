@@ -5,66 +5,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>249</width>
-    <height>171</height>
+    <width>267</width>
+    <height>193</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Beamer Controls</string>
   </property>
   <widget class="QWidget" name="centralWidget" >
-   <widget class="QPushButton" name="input1Button" >
-    <property name="geometry" >
-     <rect>
-      <x>150</x>
-      <y>10</y>
-      <width>75</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text" >
-     <string>Input 1</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="input2Button" >
-    <property name="geometry" >
-     <rect>
-      <x>150</x>
-      <y>30</y>
-      <width>75</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text" >
-     <string>Input 2</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="input3Button" >
-    <property name="geometry" >
-     <rect>
-      <x>150</x>
-      <y>50</y>
-      <width>75</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text" >
-     <string>Input 3</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="input4Button" >
-    <property name="geometry" >
-     <rect>
-      <x>150</x>
-      <y>70</y>
-      <width>75</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text" >
-     <string>Input 4</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="offButton" >
     <property name="geometry" >
      <rect>
@@ -117,6 +65,61 @@
      <string>Temperatur</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="input1Button" >
+    <property name="geometry" >
+     <rect>
+      <x>100</x>
+      <y>10</y>
+      <width>150</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Input 1 (VGA/DVI)</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="input2Button" >
+    <property name="geometry" >
+     <rect>
+      <x>100</x>
+      <y>30</y>
+      <width>150</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Input 2 (BNC)</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="input3Button" >
+    <property name="geometry" >
+     <rect>
+      <x>100</x>
+      <y>50</y>
+      <width>150</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Input 3 (Video/S-Video)</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="input4Button" >
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="geometry" >
+     <rect>
+      <x>100</x>
+      <y>70</y>
+      <width>150</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Input 4</string>
+    </property>
+   </widget>
    <widget class="QLabel" name="lampLabel" >
     <property name="geometry" >
      <rect>
@@ -128,6 +131,19 @@
     </property>
     <property name="text" >
      <string>Lamp Life Time</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="inputLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>170</y>
+      <width>201</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Selected Input</string>
     </property>
    </widget>
   </widget>

@@ -22,6 +22,12 @@ public:
 public slots:
 	void powerOn();
 	void powerOff();
+	void input1();
+	void input2();
+	void input3();
+	void input4();
+	void initialize();
+	void showToggle();
 
 private slots:
 	void processSerial();
