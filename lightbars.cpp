@@ -1,9 +1,11 @@
 #include "lightbars.h"
 #include <QVBoxLayout>
 #include <QSettings>
+#include <QJsonArray>
+#include <QJsonObject>
 
 LightBars::LightBars(QWidget *parent)
-	: QMainWindow(parent, Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint | Qt::WindowTitleHint )
+    : QMainWindow(parent, Qt::WindowStaysOnTopHint | Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint )
 {
 	setWindowTitle( tr("Light Faders") );
 	setGeometry( QRect( 100, 100, 1024, 1024 ) );
@@ -23,7 +25,7 @@ LightBars::~LightBars()
 
 }
 
-void LightBars::buildUp() {
+void LightBars::buildUp(const QJsonObject &source) {
 	QMap<int, int> status;
 	bool wasVisible = false;
 	QPoint oldpos;
@@ -37,8 +39,6 @@ void LightBars::buildUp() {
 		status = getStatus();
 	}
 
-	QSettings settings( QSettings::SystemScope, "FEGMM", "mediacenter" );
-	
 	int num_faders = settings.value( "faders", 0 ).toInt();
 	
 	QLayoutItem *child;
@@ -46,9 +46,6 @@ void LightBars::buildUp() {
 		delete child->widget();
 		delete child;
 	}
-
-
-
 
 	for( int i=0; i < num_faders; i++ ) {
 		settings.beginGroup( "fader" + QString::number(i) );
@@ -61,7 +58,7 @@ void LightBars::buildUp() {
 		settings.endGroup();
 	}
 
-	QSize size( 210, 29*layout->count() );
+    QSize size( 210, 29*layout->count() + 29 );
 	layout->parentWidget()->resize( size );
 
 	setMinimumSize( size );

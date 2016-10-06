@@ -1,3 +1,4 @@
+QT += widgets serialport
 
 HEADERS +=	beamercontrol.h \
 			configuredmx.h \
@@ -25,15 +26,5 @@ FORMS +=	beamercontrol.ui \
 			preset.ui
 			
 TARGET = bin/mediacenter
-CONFIG +=	release \
-			warn_on \
-			qt \
-			thread
-			
-TEMPLATE = vcapp
-LIBPATH += C:\d2xx
-LIBS += FTD2XX.lib
-INCLUDEPATH += ../qextserialport/
-QMAKE_LIBDIR += ../qextserialport/build
-LIBS += -lqextserialport
-win32:DEFINES  = _TTY_WIN_ QWT_DLL QT_DLL
+
+win32: LIBS += -L$$PWD/./ -lftd2xx

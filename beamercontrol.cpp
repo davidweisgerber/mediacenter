@@ -11,7 +11,7 @@ BeamerControl::BeamerControl(QWidget *parent)
 
 	m_serial = 0;
 
-	connect( ui.onButton, SIGNAL( clicked() ), this, SLOT( powerOn() ) );
+    /*connect( ui.onButton, SIGNAL( clicked() ), this, SLOT( powerOn() ) );
 	connect( ui.offButton, SIGNAL( clicked() ), this, SLOT( powerOff() ) );
 	connect( ui.input1Button, SIGNAL( clicked() ), this, SLOT( input1() ) );
 	connect( ui.input2Button, SIGNAL( clicked() ), this, SLOT( input2() ) );
@@ -20,7 +20,7 @@ BeamerControl::BeamerControl(QWidget *parent)
 
 
 	initialize();
-	processSerial();
+    processSerial();*/
 }
 
 BeamerControl::~BeamerControl()
@@ -34,17 +34,17 @@ void BeamerControl::initialize() {
 	}
 
 	QSettings settings( QSettings::SystemScope, "FEGMM", "mediacenter" );
-	m_serial = new QextSerialPort( settings.value( "beamerport", "COM3" ).toString() );
-	m_serial->setBaudRate(BaudRateType::BAUD19200);
-	m_serial->setDataBits(DataBitsType::DATA_8);
-	m_serial->setParity(ParityType::PAR_NONE);
-	m_serial->setStopBits(StopBitsType::STOP_1);
-	m_serial->setFlowControl(FlowType::FLOW_OFF);
+    m_serial = new QSerialPort( settings.value( "beamerport", "COM3" ).toString() );
+    /* m_serial->setBaudRate(QSerialPort::BAUD19200);
+    m_serial->setDataBits(QSerialPort::DATA_8);
+    m_serial->setParity(QSerialPort::PAR_NONE);
+    m_serial->setStopBits(QSerialPort::STOP_1);
+    m_serial->setFlowControl(QSerialPort::FLOW_OFF);
 	m_lastCommand = 0;
 	m_lastStatus = -2;
 	if( !m_serial->open(QIODevice::ReadWrite) ) {
 		QMessageBox::critical( this, tr("Could not open"), tr("Could not open serial port for beamer control.") );
-	}
+    }*/
 }
 
 

@@ -2,6 +2,7 @@
 #define MEDIACENTER_H
 
 #include <QMainWindow>
+#include <QJsonObject>
 #include "ui_mediacenter.h"
 #include "lightbars.h"
 #include "lightpresets.h"
@@ -17,7 +18,7 @@ class mediacenter : public QMainWindow
 	Q_OBJECT
 
 public:
-	mediacenter(QWidget *parent = 0, Qt::WFlags flags = 0);;
+    mediacenter(QWidget *parent = 0);
 	~mediacenter();
 
 private slots:
@@ -43,6 +44,8 @@ private:
 
 	QString dmxStatus;
 	QString beamerStatus;
+
+    QJsonObject m_settingsObject;
 };
 
 #endif // MEDIACENTER_H

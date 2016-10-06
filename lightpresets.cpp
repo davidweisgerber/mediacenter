@@ -7,7 +7,7 @@
 
 
 LightPresets::LightPresets(LightBars *bars, QWidget *parent)
-	: QMainWindow(parent, Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint | Qt::WindowTitleHint )
+    : QMainWindow(parent, Qt::WindowStaysOnTopHint | Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint )
 {
 	ui.setupUi(this);
 	m_bars = bars;
