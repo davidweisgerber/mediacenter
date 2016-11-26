@@ -19,7 +19,7 @@ public:
 
 public slots:
 	void showToggle();
-	void buildUp();
+    void buildUp(const QJsonObject &source);
 
 private:
 	QVBoxLayout *layout;

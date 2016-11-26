@@ -31,6 +31,7 @@ mediacenter::mediacenter(QWidget *parent)
     m_settingsObject = jsonDoc.object();
 
 	lbars = new LightBars( this );
+    lbars->buildUp(m_settingsObject);
 	lbars->show();
 
 	lpresets = new LightPresets( lbars, this );

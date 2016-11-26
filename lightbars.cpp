@@ -15,9 +15,6 @@ LightBars::LightBars(QWidget *parent)
 	wid->setLayout( layout );
 	layout->setSpacing(0);
 	layout->setMargin(0);
-
-	buildUp();
-	
 }
 
 LightBars::~LightBars()
@@ -39,7 +36,9 @@ void LightBars::buildUp(const QJsonObject &source) {
 		status = getStatus();
 	}
 
-	int num_faders = settings.value( "faders", 0 ).toInt();
+    QJsonArray faderArray = source["faders"].toArray();
+
+    int num_faders = faderArray.size();
 	
 	QLayoutItem *child;
 	while ((child = layout->takeAt(0)) != 0) {
@@ -48,14 +47,11 @@ void LightBars::buildUp(const QJsonObject &source) {
 	}
 
 	for( int i=0; i < num_faders; i++ ) {
-		settings.beginGroup( "fader" + QString::number(i) );
-		
-		LightFader *newFader = new LightFader( settings.value( "channel", 0 ).toInt(),
-			settings.value( "strength", 0 ).toInt(), 
-			settings.value( "name", "" ).toString()  );
+        LightFader *newFader = new LightFader(
+            faderArray[i].toObject()["channel"].toInt(),
+            faderArray[i].toObject()["strength"].toInt(),
+            faderArray[i].toObject()["name"].toString());
 		layout->addWidget( newFader );
-
-		settings.endGroup();
 	}
 
     QSize size( 210, 29*layout->count() + 29 );
