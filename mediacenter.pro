@@ -6,7 +6,8 @@ HEADERS +=	beamercontrol.h \
 			lightfader.h \
 			lightpresets.h \
 			mediacenter.h \
-			preset.h
+			preset.h \
+    dmxthread.h
 			
 SOURCES +=	beamercontrol.cpp \
 			configuredmx.cpp \
@@ -15,7 +16,8 @@ SOURCES +=	beamercontrol.cpp \
 			lightpresets.cpp \
 			main.cpp \
 			mediacenter.cpp \
-			preset.cpp
+			preset.cpp \
+    dmxthread.cpp
 			
 FORMS +=	beamercontrol.ui \
 			configuredmx.ui \

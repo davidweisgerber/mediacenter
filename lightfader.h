@@ -19,6 +19,9 @@ public:
 	void setName( QString name );
 
 
+signals:
+    void sliderChanged(int channel, int newValue);
+
 private slots:
 	void setSliderValue( int newValue );
 

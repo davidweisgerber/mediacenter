@@ -8,10 +8,10 @@
 #include "lightpresets.h"
 #include "beamercontrol.h"
 #include <windows.h>
-#include "FTD2XX.h"
 
 class QSystemTrayIcon;
 class ConfigureDMX;
+class DMXThread;
 
 class mediacenter : public QMainWindow
 {
@@ -25,9 +25,7 @@ private slots:
 	void showAllControls();
 	void hideAllControls();
 	void connectDMX();
-	void disconnectDMX();
-	void sendDMX();
-	void setSystrayToolTip();
+    void disconnectDMX();
 	void beamerStateChange( QString state );
 	void configureBeamer();
 
@@ -37,15 +35,13 @@ private:
 	LightPresets *lpresets;
 	BeamerControl *bcontrol;
 	ConfigureDMX *configDMX;
-	QSystemTrayIcon *systray;
+    QSystemTrayIcon *m_systray;
 
-	bool dmxConnected;
-	FT_HANDLE ftHandle;
-
-	QString dmxStatus;
 	QString beamerStatus;
 
     QJsonObject m_settingsObject;
+    DMXThread *m_dmxThread;
+    char m_dmxBuffer[512];
 };
 
 #endif // MEDIACENTER_H

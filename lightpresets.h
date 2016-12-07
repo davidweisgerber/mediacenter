@@ -23,6 +23,7 @@ public:
 public slots:
 	void showToggle();
 	void savePresets();
+    void buildUp(const QJsonObject &source);
 
 private slots:
 	void timerChanged( int time );
@@ -36,7 +37,6 @@ private slots:
 	void presetStep();
 
 private:
-	void restorePresets();
 	Ui::LightPresetsClass ui;
 	double timerValue;
 	QHBoxLayout *layout;

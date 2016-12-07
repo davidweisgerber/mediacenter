@@ -16,9 +16,12 @@ LightFader::~LightFader()
 
 }
 
-void LightFader::setSliderValue( int newValue ) {
+void LightFader::setSliderValue( int newValue )
+{
 	ui.faderStrength->setText( QString::number( newValue ) + "%" );
 	m_value = newValue;
+
+    emit sliderChanged(m_channel, m_value);
 }
 
 int LightFader::getValue() {

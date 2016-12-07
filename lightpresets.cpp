@@ -4,6 +4,8 @@
 #include <QSettings>
 #include <QTimer>
 #include <QMessageBox>
+#include <QJsonArray>
+#include <QJsonObject>
 
 
 LightPresets::LightPresets(LightBars *bars, QWidget *parent)
@@ -34,8 +36,6 @@ LightPresets::LightPresets(LightBars *bars, QWidget *parent)
 	connect( ui.deleteButton, SIGNAL( clicked() ), this, SLOT( deletePreset() ) );
 	connect( ui.blackButton, SIGNAL( clicked() ), this, SLOT( setBlack() ) );
 	connect( ui.fullPowerButton, SIGNAL( clicked() ), this, SLOT( setFull() ) );
-
-	restorePresets();
 }
 
 LightPresets::~LightPresets()
@@ -181,35 +181,36 @@ void LightPresets::savePresets() {
 		}
 		
 		settings.endGroup();
-	}
+    }
 }
 
-void LightPresets::restorePresets() {
-	QSettings settings( QSettings::UserScope, "FEGMM", "mediacenter" );
-	int presets = settings.value( "presets", 0 ).toInt();
-	timerChanged( settings.value( "autofader", 0 ).toInt() );
-	ui.masterDial->setValue( settings.value( "autofader", 0 ).toInt() );
-	
-	for( int i=0; i < presets; i++ ) {
-		settings.beginGroup( "preset" + QString::number( i ) );
-		Preset *p = new Preset( layout->count() + 1, sarea->widget() );
-		layout->addWidget( p );
-		connect( p, SIGNAL( activated() ), this, SLOT( presetActivated() ) );
+void LightPresets::buildUp(const QJsonObject &source)
+{
+    QJsonArray faderArray = source["presets"].toArray();
+    double timerValue = source["autofader"].toDouble();
+    timerChanged(timerValue);
+    ui.masterDial->setValue(timerValue);
 
-		p->setTitle( settings.value( "title" ).toString() );
-		p->setComment( settings.value( "comment" ).toString() );
+    int numberOfPresets = faderArray.size();
+    for (int i=0; i < numberOfPresets; i++)
+    {
+        Preset *p = new Preset( layout->count() + 1, sarea->widget() );
+        layout->addWidget( p );
+        connect( p, SIGNAL( activated() ), this, SLOT( presetActivated() ) );
 
-		QMap<int, int> values;
-		QStringList keys = settings.childKeys();
-		for (int j = 0; j < keys.size(); ++j) {
-			bool ok;
-			int key = keys.at(j).toInt(&ok);
-			if( ok ) {
-				values.insert( key, settings.value( keys.at(j), 0 ).toInt() );
-			}
-		}
+        p->setTitle(faderArray[i].toObject()["title"].toString());
+        p->setComment(faderArray[i].toObject()["comment"].toString());
 
-		p->setValues( values );
-		settings.endGroup();
-	}
+        QMap<int, int> values;
+
+        for (int j=0; j < 512; j++)
+        {
+            if (faderArray[i].toObject().contains(QString::number(j)))
+            {
+                values.insert(j, faderArray[i].toObject()[QString::number(j)].toInt());
+            }
+        }
+
+        p->setValues(values);
+    }
 }

@@ -1,11 +1,13 @@
 #include "lightbars.h"
 #include <QVBoxLayout>
-#include <QSettings>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QtDebug>
 
-LightBars::LightBars(QWidget *parent)
+LightBars::LightBars(char *dmxBuffer, QWidget *parent)
     : QMainWindow(parent, Qt::WindowStaysOnTopHint | Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint )
+    , m_dmxBuffer(dmxBuffer)
+    , m_master(100)
 {
 	setWindowTitle( tr("Light Faders") );
 	setGeometry( QRect( 100, 100, 1024, 1024 ) );
@@ -69,7 +71,42 @@ void LightBars::buildUp(const QJsonObject &source) {
 	if( wasVisible ) {
 		move( oldpos );
 		show();
-	}
+    }
+}
+
+void LightBars::masterChanged(int newMaster)
+{
+    m_master = newMaster;
+
+    for( int i=0; i < layout->count(); i++ )
+    {
+        LightFader *cur = qobject_cast<LightFader*>(layout->itemAt(i)->widget());
+
+        if (cur == nullptr || cur->getChannel() < 0 || cur->getChannel() >= 512)
+        {
+            qCritical() << "Something is weird at master change";
+            return;
+        }
+
+        float value = cur->getValue();
+        value = value * static_cast<float>(m_master) / 100.0;
+        value = value * 2.55;
+        m_dmxBuffer[cur->getChannel()] = static_cast<unsigned char>(value);
+    }
+}
+
+void LightBars::sliderChanged(int channel, int newValue)
+{
+    if (channel < 0 || channel >= 512)
+    {
+        qCritical() << "Something is weird" << channel;
+        return;
+    }
+
+    float value = newValue;
+    value = value * static_cast<float>(m_master) / 100.0;
+    value = value * 2.55;
+    m_dmxBuffer[channel] = static_cast<unsigned char>(value);
 }
 
 QMap<int, int> LightBars::getStatus() {
