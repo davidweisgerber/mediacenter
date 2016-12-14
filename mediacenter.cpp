@@ -27,7 +27,8 @@ mediacenter::mediacenter(QWidget *parent)
         qDebug() << "Could not open" << file.fileName() << "for reading";
     }
 
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(file.readAll());
+    QJsonParseError error;
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(file.readAll(), &error);
     file.close();
 
     m_settingsObject = jsonDoc.object();
@@ -73,8 +74,8 @@ mediacenter::mediacenter(QWidget *parent)
 	menu->addAction( tr("Show/Hide Light Presets"), lpresets, SLOT( showToggle() ) );
     //menu->addAction( tr("Show/Hide Beamer Control"), bcontrol, SLOT( showToggle() ) );
 	menu->addSeparator();
-	menu->addAction( tr("Configure DMX Channels"), configDMX, SLOT( show() ) );
-	menu->addAction( tr("Configure Beamer Connection"), this, SLOT( configureBeamer() ) );
+    //menu->addAction( tr("Configure DMX Channels"), configDMX, SLOT( show() ) );
+    //menu->addAction( tr("Configure Beamer Connection"), this, SLOT( configureBeamer() ) );
 	menu->addSeparator();
 	menu->addAction( tr("Close"), qApp, SLOT(quit()) );
 	

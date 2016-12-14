@@ -6,6 +6,9 @@
 #include <QMessageBox>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QJsonDocument>
+#include <QFile>
+#include <QDir>
 
 
 LightPresets::LightPresets(LightBars *bars, QWidget *parent)
@@ -36,6 +39,8 @@ LightPresets::LightPresets(LightBars *bars, QWidget *parent)
 	connect( ui.deleteButton, SIGNAL( clicked() ), this, SLOT( deletePreset() ) );
 	connect( ui.blackButton, SIGNAL( clicked() ), this, SLOT( setBlack() ) );
 	connect( ui.fullPowerButton, SIGNAL( clicked() ), this, SLOT( setFull() ) );
+
+    m_settingsFile = QDir::homePath() + QDir::separator() + "mediacenter.settings.json";
 }
 
 LightPresets::~LightPresets()
@@ -118,6 +123,7 @@ void LightPresets::timerChanged( int time ) {
 
 void LightPresets::masterChanged( int strength ) {
 	ui.masterStrength->setText( QString::number( strength ) + "%" );
+    m_bars->masterChanged(strength);
 }
 
 void LightPresets::presetActivated() {
@@ -151,7 +157,7 @@ void LightPresets::presetStep() {
 		QTimer::singleShot( 25, this, SLOT( presetStep() ) );
 	} else {
 		m_bars->setStatus( m_fadeEnd );
-	}
+    }
 }
 
 void LightPresets::showToggle() {
@@ -162,39 +168,77 @@ int LightPresets::getMaster() {
 	return ui.masterSlider->value();
 }
 
-void LightPresets::savePresets() {
-	QSettings settings( QSettings::UserScope, "FEGMM", "mediacenter" );
-	settings.setValue( "presets", layout->count() );
-	settings.setValue( "autofader", ui.masterDial->value() );
+void LightPresets::savePresets()
+{
+    QJsonArray array;
 
-	for( int i=0; i < layout->count(); i++ ) {
-		settings.beginGroup( "preset" + QString::number( i ) );
-		Preset *cur = (Preset*)layout->itemAt(i)->widget();
-		settings.setValue( "title", cur->getTitle() );
-		settings.setValue( "comment", cur->getComment() );
+    for( int i=0; i < layout->count(); i++ )
+    {
+        Preset *cur = (Preset*)layout->itemAt(i)->widget();
+        if (cur->isSystem())
+        {
+            continue;
+        }
+
+        QJsonObject object;
+        object["title"] = cur->getTitle();
+        object["comment"] = cur->getComment();
 		
 		QMap<int, int> values = cur->getValues();
 		QList<int> channels = values.uniqueKeys();
-		for (int i=0; i < channels.size(); ++i) {
-			settings.setValue( QString::number( channels.at(i) ),
-				values.value(channels.at(i), 0) );
+        for (int i=0; i < channels.size(); ++i)
+        {
+            object[QString::number(channels.at(i))] = values.value(channels.at(i), 0);
 		}
-		
-		settings.endGroup();
+
+        array.append(object);
     }
+
+    QByteArray settings = QJsonDocument(array).toJson();
+    QFile file(m_settingsFile);
+    if (file.open(QIODevice::WriteOnly) == false)
+    {
+        QMessageBox::critical(this, tr("Error"), tr("Could not save settings to %1").arg(m_settingsFile));
+        return;
+    }
+
+    file.write(settings);
+    file.close();
 }
 
 void LightPresets::buildUp(const QJsonObject &source)
 {
     QJsonArray faderArray = source["presets"].toArray();
     double timerValue = source["autofader"].toDouble();
+
+    timerValue = log(timerValue * 100) * 10;
+    //timerValue = exp( (double)time/10 ) / 100;
+
     timerChanged(timerValue);
     ui.masterDial->setValue(timerValue);
 
+    addPresets(faderArray, true);
+
+    QFile file(m_settingsFile);
+    if (file.open(QIODevice::ReadOnly) == false)
+    {
+        return;
+    }
+
+    QByteArray settings = file.readAll();
+    file.close();
+
+    QJsonDocument document = QJsonDocument::fromJson(settings);
+    addPresets(document.array(), false);
+}
+
+void LightPresets::addPresets(const QJsonArray &faderArray, bool isSystem)
+{
     int numberOfPresets = faderArray.size();
     for (int i=0; i < numberOfPresets; i++)
     {
         Preset *p = new Preset( layout->count() + 1, sarea->widget() );
+        p->setSystem(isSystem);
         layout->addWidget( p );
         connect( p, SIGNAL( activated() ), this, SLOT( presetActivated() ) );
 

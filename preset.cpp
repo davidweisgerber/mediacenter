@@ -4,6 +4,7 @@
 
 Preset::Preset(int number, QWidget *parent)
 	: QWidget(parent)
+    , m_isSystem(false)
 {
 	ui.setupUi(this);
 	setAutoFillBackground( true );
@@ -56,7 +57,12 @@ void Preset::setTitle( QString title ) {
 }
 
 void Preset::setComment( QString comment ) {
-	ui.comment->setText( comment );
+    ui.comment->setText( comment );
+}
+
+void Preset::setSystem(bool isSystem)
+{
+    m_isSystem = isSystem;
 }
 
 QString Preset::getTitle() {
@@ -67,7 +73,12 @@ QString Preset::getComment() {
 }
 
 int Preset::getNumber() {
-	return m_number;
+    return m_number;
+}
+
+bool Preset::isSystem()
+{
+    return m_isSystem;
 }
 
 void Preset::rename() {
