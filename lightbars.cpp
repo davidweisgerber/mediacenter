@@ -54,6 +54,7 @@ void LightBars::buildUp(const QJsonObject &source) {
             faderArray[i].toObject()["strength"].toInt(),
             faderArray[i].toObject()["name"].toString());
 		layout->addWidget( newFader );
+        connect(newFader, &LightFader::sliderChanged, this, &LightBars::sliderChanged);
 	}
 
     QSize size( 210, 29*layout->count() + 29 );
