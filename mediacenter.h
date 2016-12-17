@@ -2,31 +2,30 @@
 #define MEDIACENTER_H
 
 #include <QMainWindow>
+#include <QJsonObject>
 #include "ui_mediacenter.h"
 #include "lightbars.h"
 #include "lightpresets.h"
 #include "beamercontrol.h"
 #include <windows.h>
-#include "FTD2XX.h"
 
 class QSystemTrayIcon;
 class ConfigureDMX;
+class DMXThread;
 
 class mediacenter : public QMainWindow
 {
 	Q_OBJECT
 
 public:
-	mediacenter(QWidget *parent = 0, Qt::WFlags flags = 0);;
+    mediacenter(QWidget *parent = 0);
 	~mediacenter();
 
 private slots:
 	void showAllControls();
 	void hideAllControls();
 	void connectDMX();
-	void disconnectDMX();
-	void sendDMX();
-	void setSystrayToolTip();
+    void disconnectDMX();
 	void beamerStateChange( QString state );
 	void configureBeamer();
 
@@ -36,13 +35,13 @@ private:
 	LightPresets *lpresets;
 	BeamerControl *bcontrol;
 	ConfigureDMX *configDMX;
-	QSystemTrayIcon *systray;
+    QSystemTrayIcon *m_systray;
 
-	bool dmxConnected;
-	FT_HANDLE ftHandle;
-
-	QString dmxStatus;
 	QString beamerStatus;
+
+    QJsonObject m_settingsObject;
+    DMXThread *m_dmxThread;
+    char m_dmxBuffer[512];
 };
 
 #endif // MEDIACENTER_H

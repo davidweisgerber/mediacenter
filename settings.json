@@ -1,0 +1,231 @@
+﻿{
+	"faders":
+	[
+		{
+			"channel":0,
+			"strength":0,
+			"name":"Saal Technik"
+		},
+		{
+			"channel":1,
+			"strength":0,
+			"name":"Saal hinten rechts"
+		},
+		{
+			"channel":2,
+			"strength":0,
+			"name":"Saal hinten links"
+		},
+		{
+			"channel":3,
+			"strength":0,
+			"name":"Saal mitte rechts"
+		},
+		{
+			"channel":4,
+			"strength":0,
+			"name":"Saal mitte links"
+		},
+		{
+			"channel":5,
+			"strength":0,
+			"name":"Saal vorne rechts"
+		},
+		{
+			"channel":6,
+			"strength":0,
+			"name":"Saal vorne links"
+		},
+		{
+			"channel":11,
+			"strength":0,
+			"name":"Saal unter der Gallerie"
+		},
+		{
+			"channel":7,
+			"strength":0,
+			"name":"Wand rechts (Fluter)"
+		},
+		{
+			"channel":8,
+			"strength":0,
+			"name":"Wand links (Fluter)"
+		},
+		{
+			"channel":9,
+			"strength":0,
+			"name":"3/2 und 4/2 Kanzel"
+		},
+		{
+			"channel":15,
+			"strength":0,
+			"name":"3/1 Kanzel"
+		},
+		{
+			"channel":22,
+			"strength":0,
+			"name":"Rechts aussen Kanzel"
+		},
+		{
+			"channel":10,
+			"strength":0,
+			"name":"4/1 Kreuz"
+		},
+		{
+			"channel":12,
+			"strength":0,
+			"name":"3/4 Bühne rechts Frost"
+		},
+		{
+			"channel":14,
+			"strength":0,
+			"name":"3/3 Bühne mitte"
+		},
+		{
+			"channel":16,
+			"strength":0,
+			"name":"2/4 Bühne mitte"
+		},
+		{
+			"channel":17,
+			"strength":0,
+			"name":"2/3 Klavier (Profiler)"
+		},
+		{
+			"channel":18,
+			"strength":0,
+			"name":"2/2 Schlagzeug (Frost)"
+		},
+		{
+			"channel":19,
+			"strength":0,
+			"name":"2/1 Bühne links (Frost)"
+		},
+		{
+			"channel":20,
+			"strength":0,
+			"name":"1/3 Bühne mitte"
+		},
+		{
+			"channel":21,
+			"strength":0,
+			"name":"1/2 Bühne mitte/links"
+		},
+		{
+			"channel":23,
+			"strength":0,
+			"name":"1/1 Bühne links"
+		}
+	],
+	"presets":[
+	    {
+        "0": 60,
+        "1": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "14": 0,
+        "15": 0,
+        "16": 0,
+        "17": 0,
+        "18": 0,
+        "19": 0,
+        "2": 0,
+        "20": 0,
+        "21": 0,
+        "22": 0,
+        "23": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "comment": "Nur Techniklicht",
+        "title": "Technik"
+    },
+    {
+        "0": 40,
+        "1": 100,
+        "10": 52,
+        "11": 100,
+        "12": 52,
+        "14": 44,
+        "15": 49,
+        "16": 52,
+        "17": 70,
+        "18": 50,
+        "19": 52,
+        "2": 100,
+        "20": 43,
+        "21": 48,
+        "22": 71,
+        "23": 58,
+        "3": 100,
+        "4": 100,
+        "5": 100,
+        "6": 100,
+        "7": 0,
+        "8": 100,
+        "9": 39,
+        "comment": "Prediger, Musik und Saal an",
+        "title": "Standard"
+    },
+    {
+        "0": 40,
+        "1": 100,
+        "10": 52,
+        "11": 100,
+        "12": 52,
+        "14": 0,
+        "15": 49,
+        "16": 0,
+        "17": 0,
+        "18": 0,
+        "19": 0,
+        "2": 100,
+        "20": 0,
+        "21": 0,
+        "22": 71,
+        "23": 0,
+        "3": 100,
+        "4": 100,
+        "5": 100,
+        "6": 100,
+        "7": 0,
+        "8": 100,
+        "9": 39,
+        "comment": "Prediger und Saal an",
+        "title": "Predigt"
+    },
+    {
+        "0": 40,
+        "1": 100,
+        "10": 52,
+        "11": 100,
+        "12": 0,
+        "14": 44,
+        "15": 0,
+        "16": 52,
+        "17": 70,
+        "18": 50,
+        "19": 52,
+        "2": 100,
+        "20": 43,
+        "21": 48,
+        "22": 0,
+        "23": 58,
+        "3": 100,
+        "4": 100,
+        "5": 100,
+        "6": 100,
+        "7": 0,
+        "8": 100,
+        "9": 0,
+        "comment": "Musiker und Saal an",
+        "title": "Musik"
+    }
+	],
+	"autofader":1.5
+}

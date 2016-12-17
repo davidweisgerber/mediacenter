@@ -10,6 +10,7 @@
 
 class Preset;
 class QTimer;
+class QJsonArray;
 
 class LightPresets : public QMainWindow
 {
@@ -23,6 +24,7 @@ public:
 public slots:
 	void showToggle();
 	void savePresets();
+    void buildUp(const QJsonObject &source);
 
 private slots:
 	void timerChanged( int time );
@@ -34,9 +36,9 @@ private slots:
 	void setBlack();
 	void setFull();
 	void presetStep();
+    void addPresets(const QJsonArray &array, bool isSystem);
 
 private:
-	void restorePresets();
 	Ui::LightPresetsClass ui;
 	double timerValue;
 	QHBoxLayout *layout;
@@ -45,6 +47,7 @@ private:
 	Preset *m_current;
 	QTime m_fadeCounter;
 	QMap<int, int> m_fadeStart, m_fadeEnd;
+    QString m_settingsFile;
 };
 
 #endif // LIGHTPRESETS_H

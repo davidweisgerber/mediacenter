@@ -2,7 +2,7 @@
 #define BEAMERCONTROL_H
 
 #include <QMainWindow>
-#include <QExtSerialPort.h>
+#include <QSerialPort>
 #include <QTime>
 #include "ui_beamercontrol.h"
 
@@ -40,7 +40,7 @@ private:
 	void processCommandFeedback( QString buf );
 	void proceedCommandPipe();
 	Ui::BeamerControlClass ui;
-	QextSerialPort *m_serial;
+    QSerialPort *m_serial;
 	int m_lastCommand;
 	int m_lastStatus;
 	QTime m_lastAction;
