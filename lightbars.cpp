@@ -43,18 +43,21 @@ void LightBars::buildUp(const QJsonObject &source) {
     int num_faders = faderArray.size();
 	
 	QLayoutItem *child;
-	while ((child = layout->takeAt(0)) != 0) {
+    while ((child = layout->takeAt(0)) != 0)
+    {
 		delete child->widget();
 		delete child;
 	}
 
-	for( int i=0; i < num_faders; i++ ) {
+    for( int i=0; i < num_faders; i++ )
+    {
         LightFader *newFader = new LightFader(
             faderArray[i].toObject()["channel"].toInt(),
             faderArray[i].toObject()["strength"].toInt(),
             faderArray[i].toObject()["name"].toString());
 		layout->addWidget( newFader );
         connect(newFader, &LightFader::sliderChanged, this, &LightBars::sliderChanged);
+        sliderChanged(newFader->getChannel(), newFader->getValue());
 	}
 
     QSize size( 210, 29*layout->count() + 29 );
