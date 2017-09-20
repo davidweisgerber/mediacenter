@@ -22,9 +22,6 @@ public slots:
     void buildUp(const QJsonObject &source);
     void masterChanged(int newMaster);
 
-private slots:
-    void sliderChanged(int channel, int newValue);
-
 private:
 	QVBoxLayout *layout;
     char *m_dmxBuffer;

@@ -24,17 +24,20 @@ LightBars::~LightBars()
 
 }
 
-void LightBars::buildUp(const QJsonObject &source) {
+void LightBars::buildUp(const QJsonObject &source)
+{
 	QMap<int, int> status;
 	bool wasVisible = false;
 	QPoint oldpos;
-	if( isVisible() ) {
+    if( isVisible() )
+    {
 		wasVisible = true;
 		oldpos = pos();
 		hide();
 	}
 	
-	if( layout->count() > 0 ) {
+    if( layout->count() > 0 )
+    {
 		status = getStatus();
 	}
 
@@ -51,13 +54,21 @@ void LightBars::buildUp(const QJsonObject &source) {
 
     for( int i=0; i < num_faders; i++ )
     {
+        int mode = faderArray[i].toObject()["mode"].toInt(0);
+        int strength = faderArray[i].toObject()["strength"].toInt(0);
+
         LightFader *newFader = new LightFader(
             faderArray[i].toObject()["channel"].toInt(),
-            faderArray[i].toObject()["strength"].toInt(),
-            faderArray[i].toObject()["name"].toString());
+            faderArray[i].toObject()["name"].toString(),
+            static_cast<LightFader::OperatingMode>(mode),
+            m_dmxBuffer);
+
+        if (mode == 0)
+        {
+            newFader->setValue(strength, 0);
+        }
+
 		layout->addWidget( newFader );
-        connect(newFader, &LightFader::sliderChanged, this, &LightBars::sliderChanged);
-        sliderChanged(newFader->getChannel(), newFader->getValue());
 	}
 
     QSize size( 210, 29*layout->count() + 29 );
@@ -68,11 +79,13 @@ void LightBars::buildUp(const QJsonObject &source) {
 
 	resize( size );
 
-	if( status.count() > 0 ) {
+    if( status.count() > 0 )
+    {
 		setStatus( status );
 	}
 
-	if( wasVisible ) {
+    if( wasVisible )
+    {
 		move( oldpos );
 		show();
     }
@@ -85,52 +98,44 @@ void LightBars::masterChanged(int newMaster)
     for( int i=0; i < layout->count(); i++ )
     {
         LightFader *cur = qobject_cast<LightFader*>(layout->itemAt(i)->widget());
-
-        if (cur == nullptr || cur->getChannel() < 0 || cur->getChannel() >= 512)
-        {
-            qCritical() << "Something is weird at master change";
-            return;
-        }
-
-        float value = cur->getValue();
-        value = value * static_cast<float>(m_master) / 100.0;
-        value = value * 2.55;
-        m_dmxBuffer[cur->getChannel()] = static_cast<unsigned char>(value);
+        cur->setMasterValue(newMaster);
     }
 }
 
-void LightBars::sliderChanged(int channel, int newValue)
+QMap<int, int> LightBars::getStatus()
 {
-    if (channel < 0 || channel >= 512)
-    {
-        qCritical() << "Something is weird" << channel;
-        return;
-    }
-
-    float value = newValue;
-    value = value * static_cast<float>(m_master) / 100.0;
-    value = value * 2.55;
-    m_dmxBuffer[channel] = static_cast<unsigned char>(value);
-}
-
-QMap<int, int> LightBars::getStatus() {
 	QMap<int, int> retVal;
 
-	for( int i=0; i < layout->count(); i++ ) {
-		LightFader *cur = (LightFader*)layout->itemAt(i)->widget();
-		retVal.insert( cur->getChannel(), cur->getValue() );
+    for( int i=0; i < layout->count(); i++ )
+    {
+        LightFader *cur = qobject_cast<LightFader*>(layout->itemAt(i)->widget());
+        int startChannel = cur->getStartChannel();
+        QVector<int> values = cur->getValues();
+
+        for (int i=0; i < values.size(); i++)
+        {
+            retVal.insert(startChannel + i, values[i]);
+        }
 	}
 
 	return retVal;
 }
 
-void LightBars::setStatus( QMap<int, int> status ) {
-	for( int i=0; i < layout->count(); i++ ) {
-		LightFader *cur = (LightFader*)layout->itemAt(i)->widget();
-		cur->setValue( status.value( cur->getChannel(), 0 ) );
+void LightBars::setStatus( QMap<int, int> status )
+{
+    for( int i=0; i < layout->count(); i++ )
+    {
+        LightFader *cur = qobject_cast<LightFader*>(layout->itemAt(i)->widget());
+        int numberOfChannels = cur->getValues().size();
+
+        for (int i=0; i < numberOfChannels; i++)
+        {
+            cur->setValue(status.value(cur->getStartChannel() + i, 0), i);
+        }
 	}
 }
 
-void LightBars::showToggle() {
+void LightBars::showToggle()
+{
 	setVisible( !isVisible() );
 }

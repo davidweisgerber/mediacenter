@@ -30,3 +30,6 @@ FORMS +=	beamercontrol.ui \
 TARGET = bin/mediacenter
 
 win32: LIBS += -L$$PWD/./ -lftd2xx
+
+RESOURCES += \
+    mediacenter.qrc

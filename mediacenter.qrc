@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>off.xpm</file>
+        <file>on.xpm</file>
+    </qresource>
+</RCC>

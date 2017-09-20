@@ -1,6 +1,4 @@
 #include "mediacenter.h"
-#include "off.xpm"
-#include "on.xpm"
 #include <QSystemTrayIcon>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -48,7 +46,7 @@ mediacenter::mediacenter(QWidget *parent)
     bcontrol = nullptr;
 
 	configDMX = new ConfigureDMX( this );
-    configDMX->setWindowIcon( QIcon( QPixmap(on_xpm) ) );
+    configDMX->setWindowIcon(QIcon(QPixmap(QString("://on.xpm"))));
 
 	connect( configDMX, SIGNAL( configured() ), lbars, SLOT( buildUp() ) );
 
@@ -60,7 +58,7 @@ mediacenter::mediacenter(QWidget *parent)
 
 	hide();
 
-    m_systray = new QSystemTrayIcon( QIcon( QPixmap( off_xpm ) ), this );
+    m_systray = new QSystemTrayIcon(QIcon(QString("://off.xpm")), this);
     m_systray->show();
 
 	QMenu *menu = new QMenu();
@@ -117,7 +115,7 @@ void mediacenter::connectDMX()
 
     m_systray->showMessage( tr("DMX Connected!"), tr("You can control the light now."), QSystemTrayIcon::Information, 5000 );
     m_systray->setToolTip(tr("DMX connected"));
-    m_systray->setIcon( QIcon(  QPixmap( on_xpm ) ) );
+    m_systray->setIcon( QIcon(  QPixmap(QString("://on.xpm")) ) );
 }
 
 void mediacenter::disconnectDMX()
@@ -126,7 +124,7 @@ void mediacenter::disconnectDMX()
 
     m_systray->showMessage( tr("DMX Disconnected!"), tr("Controls have been turned off."), QSystemTrayIcon::Information, 5000 );
     m_systray->setToolTip(tr("DMX disconnected"));
-    m_systray->setIcon( QIcon(  QPixmap( off_xpm ) ) );
+    m_systray->setIcon( QIcon(  QPixmap(QString("://off.xpm")) ) );
 }
 
 void mediacenter::beamerStateChange( QString state ) {

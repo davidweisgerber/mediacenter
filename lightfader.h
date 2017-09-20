@@ -9,25 +9,38 @@ class LightFader : public QWidget
 	Q_OBJECT
 
 public:
-	LightFader(int channel, int strength, QString name, QWidget *parent = 0);
+    enum OperatingMode
+    {
+        SINGLE_CHANNEL,
+        EUROLITE_PMD_8
+    };
+
+    LightFader(int startChannel, QString name, OperatingMode mode, char *dmxData, QWidget *parent = 0);
 	~LightFader();
-	int getValue();
-	int getChannel();
-	void setValue( int value );
-	void setChannel( int channel );
-	QString getName();
-	void setName( QString name );
 
+    const QVector<int> &getValues();
+    int getStartChannel();
 
-signals:
-    void sliderChanged(int channel, int newValue);
+    void setValue(int value, int channel);
+    void setMasterValue(int value);
+
+    QString getName();
 
 private slots:
-	void setSliderValue( int newValue );
+    void setSliderValue(int newValue);
+    void configureClicked();
 
 private:
-	int m_value;
-	int m_channel;
+    void setValueInternal(int value, int channel);
+    void calculateValues();
+    void calculateValuesSingle();
+    void calculateValuesPMD8();
+
+    QVector<int> m_values;
+    int m_startChannel;
+    OperatingMode m_operatingMode;
+    char *m_dmxData;
+    int m_masterValue;
 	Ui::LightFaderClass ui;
 };
 
