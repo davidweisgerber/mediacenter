@@ -1,4 +1,6 @@
 #include <QtDebug>
+#include <QInputDialog>
+#include "eurolitepmd8configuration.h"
 #include "lightfader.h"
 
 LightFader::LightFader(int startChannel, QString name, OperatingMode mode, char *dmxData,  QWidget *parent)
@@ -96,7 +98,32 @@ void LightFader::setSliderValue(int newValue)
 
 void LightFader::configureClicked()
 {
+    switch (m_operatingMode)
+    {
+        case SINGLE_CHANNEL:
+        {
+            QInputDialog *dlg = new QInputDialog(this);
+            dlg->setInputMode(QInputDialog::IntInput);
+            dlg->setIntMaximum(255);
+            dlg->setIntMinimum(0);
+            dlg->setIntValue(m_values[0]);
+            dlg->setOption(QInputDialog::NoButtons, true);
+            dlg->setWindowTitle(ui.faderName->text());
+            dlg->setLabelText(tr("DMX Value:"));
+            connect(dlg, &QInputDialog::intValueChanged, this, &LightFader::setValueFromDialog);
+            dlg->exec();
+            break;
+        }
+        case EUROLITE_PMD_8:
+            EuroLitePMD8Configuration *dlg = new EuroLitePMD8Configuration(this);
+            dlg->exec();
+            break;
+    }
+}
 
+void LightFader::setValueFromDialog(int value)
+{
+    setValue(value, 0);
 }
 
 void LightFader::calculateValues()

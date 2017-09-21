@@ -29,6 +29,7 @@ public:
 private slots:
     void setSliderValue(int newValue);
     void configureClicked();
+    void setValueFromDialog(int value);
 
 private:
     void setValueInternal(int value, int channel);

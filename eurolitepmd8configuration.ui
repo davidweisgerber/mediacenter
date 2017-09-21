@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EuroLitePMD8Configuration</class>
+ <widget class="QDialog" name="EuroLitePMD8Configuration">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>565</width>
+    <height>428</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Lamp 1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Lamp 3</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_9">
+     <property name="text">
+      <string>Lamp 6</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>Lamp 5</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>Lamp 4</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="label_10">
+     <property name="text">
+      <string>Lamp 7</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="label_11">
+     <property name="text">
+      <string>Lamp 8</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QComboBox" name="modeBox">
+     <item>
+      <property name="text">
+       <string>Dimmer</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>R</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>G</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>B</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>RG</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>GB</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>RB</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>RGB</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Color 1</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Color 2</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Color 3</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Color 4</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Color 5</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Color 6</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Color 7</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Color 8</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Dream</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Meteor</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Fade</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Change</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Flow 1</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Flow 2</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Flow 3</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Flow 4</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Flow 5</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Flow 6</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Flow 7</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Flow 8</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Flow 9</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Sound</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Lamp 2</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Mode</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Master Dimmer / Speed / Sensibility</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Flash</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QSpinBox" name="dimmerBox">
+     <property name="maximum">
+      <number>255</number>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLabel" name="colorLabel1">
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QSpinBox" name="flashBox">
+     <property name="maximum">
+      <number>255</number>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QPushButton" name="colorButton1">
+     <property name="text">
+      <string>Choose Color</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="QPushButton" name="colorButton2">
+     <property name="text">
+      <string>Choose Color</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="QPushButton" name="colorButton3">
+     <property name="text">
+      <string>Choose Color</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="2">
+    <widget class="QPushButton" name="colorButton4">
+     <property name="text">
+      <string>Choose Color</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="2">
+    <widget class="QPushButton" name="colorButton5">
+     <property name="text">
+      <string>Choose Color</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="2">
+    <widget class="QPushButton" name="colorButton6">
+     <property name="text">
+      <string>Choose Color</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="2">
+    <widget class="QPushButton" name="colorButton7">
+     <property name="text">
+      <string>Choose Color</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="2">
+    <widget class="QPushButton" name="colorButton8">
+     <property name="text">
+      <string>Choose Color</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLabel" name="colorLabel2">
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QLabel" name="colorLabel3">
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QLabel" name="colorLabel4">
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QLabel" name="colorLabel5">
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="QLabel" name="colorLabel6">
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="QLabel" name="colorLabel7">
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1">
+    <widget class="QLabel" name="colorLabel8">
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
