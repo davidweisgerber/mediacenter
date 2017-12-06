@@ -153,6 +153,8 @@ bool LightBars::isFaderMaster(int channel)
             return true;
         }
     }
+
+    return false;
 }
 
 void LightBars::showToggle()

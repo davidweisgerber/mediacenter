@@ -83,8 +83,11 @@ mediacenter::mediacenter(QWidget *parent)
     m_dmxThread->connectDMX();
     m_dmxThread->start(QThread::TimeCriticalPriority);
 
+#ifdef QT_DEBUG
     DebugWindow *debugWindow = new DebugWindow(m_dmxBuffer, this);
     debugWindow->show();
+#endif //QT_DEBUG
+
 }
 
 mediacenter::~mediacenter()
