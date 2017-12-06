@@ -8,7 +8,8 @@ HEADERS +=	beamercontrol.h \
 			mediacenter.h \
 			preset.h \
     dmxthread.h \
-    eurolitepmd8configuration.h
+    eurolitepmd8configuration.h \
+    debugwindow.h
 			
 SOURCES +=	beamercontrol.cpp \
 			configuredmx.cpp \
@@ -19,7 +20,8 @@ SOURCES +=	beamercontrol.cpp \
 			mediacenter.cpp \
 			preset.cpp \
     dmxthread.cpp \
-    eurolitepmd8configuration.cpp
+    eurolitepmd8configuration.cpp \
+    debugwindow.cpp
 			
 FORMS +=	beamercontrol.ui \
 			configuredmx.ui \
@@ -28,7 +30,8 @@ FORMS +=	beamercontrol.ui \
 			lightpresets.ui \
 			mediacenter.ui \
 			preset.ui \
-    eurolitepmd8configuration.ui
+    eurolitepmd8configuration.ui \
+    debugwindow.ui
 			
 TARGET = bin/mediacenter
 

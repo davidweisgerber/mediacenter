@@ -146,9 +146,16 @@ void LightPresets::presetStep() {
 	QMap<int, int> status;
 	QList<int> channels = m_fadeEnd.uniqueKeys();
 	for (int i=0; i < channels.size(); ++i) {
-		status[channels.at(i)] = m_fadeStart[channels.at(i)] +
-			(double)( m_fadeEnd[channels.at(i)] - m_fadeStart[channels.at(i)] ) *
-			(double)( (double)m_fadeCounter.elapsed() / (double)(timerValue * 1000) );
+        if (m_bars->isFaderMaster(i))
+        {
+            status[channels.at(i)] = m_fadeStart[channels.at(i)] +
+                (double)( m_fadeEnd[channels.at(i)] - m_fadeStart[channels.at(i)] ) *
+                (double)( (double)m_fadeCounter.elapsed() / (double)(timerValue * 1000) );
+        }
+        else
+        {
+            status[channels.at(i)] = m_fadeEnd[channels.at(i)];
+        }
 	}
 
 	m_bars->setStatus( status );
@@ -230,6 +237,8 @@ void LightPresets::buildUp(const QJsonObject &source)
 
     QJsonDocument document = QJsonDocument::fromJson(settings);
     addPresets(document.array(), false);
+
+    m_bars->masterChanged(ui.masterSlider->value());
 }
 
 void LightPresets::addPresets(const QJsonArray &faderArray, bool isSystem)

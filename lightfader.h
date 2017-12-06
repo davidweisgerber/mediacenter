@@ -23,6 +23,7 @@ public:
 
     void setValue(int value, int channel);
     void setMasterValue(int value);
+    OperatingMode getMode() const;
 
     QString getName();
 

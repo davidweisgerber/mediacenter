@@ -67,6 +67,10 @@ void LightBars::buildUp(const QJsonObject &source)
         {
             newFader->setValue(strength, 0);
         }
+        else if (mode == 1)
+        {
+            newFader->setValue(strength, 1);
+        }
 
 		layout->addWidget( newFader );
 	}
@@ -132,7 +136,23 @@ void LightBars::setStatus( QMap<int, int> status )
         {
             cur->setValue(status.value(cur->getStartChannel() + i, 0), i);
         }
-	}
+    }
+}
+
+bool LightBars::isFaderMaster(int channel)
+{
+    for( int i=0; i < layout->count(); i++ )
+    {
+        LightFader *cur = qobject_cast<LightFader*>(layout->itemAt(i)->widget());
+        if (cur->getMode() == LightFader::SINGLE_CHANNEL && channel == cur->getStartChannel())
+        {
+            return true;
+        }
+        else if (cur->getMode() == LightFader::EUROLITE_PMD_8 && channel == cur->getStartChannel() + 1)
+        {
+            return true;
+        }
+    }
 }
 
 void LightBars::showToggle()

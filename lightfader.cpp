@@ -79,11 +79,16 @@ void LightFader::setMasterValue(int value)
     calculateValues();
 }
 
+LightFader::OperatingMode LightFader::getMode() const
+{
+    return m_operatingMode;
+}
+
 void LightFader::setSliderValue(int newValue)
 {
     ui.faderStrength->setText(QString::number(newValue) + "%");
 
-    int value = static_cast<int>(static_cast<double>(newValue) * 2.55);
+    int value = static_cast<int>(round(static_cast<double>(newValue) * 2.55));
 
     switch (m_operatingMode)
     {
@@ -145,7 +150,7 @@ void LightFader::calculateValuesSingle()
     value = value * m_masterValue;
     value = value / 100;
 
-    m_dmxData[m_startChannel] = static_cast<char>(static_cast<unsigned char>(value));
+    m_dmxData[m_startChannel] = static_cast<char>(static_cast<unsigned char>(round(value)));
 }
 
 void LightFader::calculateValuesPMD8()
@@ -158,7 +163,7 @@ void LightFader::calculateValuesPMD8()
         value = value * m_masterValue;
         value = value / 100;
 
-        m_dmxData[m_startChannel + 1] = static_cast<char>(static_cast<unsigned char>(value));
+        m_dmxData[m_startChannel + 1] = static_cast<char>(static_cast<unsigned char>(round(value)));
     }
     else
     {

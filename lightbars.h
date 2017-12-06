@@ -16,6 +16,7 @@ public:
 	~LightBars();
 	QMap<int, int>getStatus();
 	void setStatus( QMap<int, int> status );
+    bool isFaderMaster(int channel);
 
 public slots:
 	void showToggle();

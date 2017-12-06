@@ -9,6 +9,7 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QtDebug>
+#include "debugwindow.h"
 #include "configuredmx.h"
 #include "dmxthread.h"
 
@@ -81,6 +82,9 @@ mediacenter::mediacenter(QWidget *parent)
 
     m_dmxThread->connectDMX();
     m_dmxThread->start(QThread::TimeCriticalPriority);
+
+    DebugWindow *debugWindow = new DebugWindow(m_dmxBuffer, this);
+    debugWindow->show();
 }
 
 mediacenter::~mediacenter()
