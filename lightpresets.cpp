@@ -27,7 +27,7 @@ LightPresets::LightPresets(LightBars *bars, QWidget *parent)
 	layout = new QHBoxLayout();
 	layout->setSizeConstraint( QLayout::SetFixedSize );
 	layout->setSpacing( 2 );
-	layout->setMargin( 1 );
+	layout->setContentsMargins( 1, 1, 1, 1 );
 
 	base->setLayout( layout );
 	sarea->setWidget( base );
@@ -77,7 +77,7 @@ void LightPresets::overwritePreset() {
 void LightPresets::setBlack() {
 	QMap<int, int> map = m_bars->getStatus();
 	QMap<int, int> retVal;
-	QList<int> channels = map.uniqueKeys();
+	QList<int> channels = map.keys();
 	for (int i=0; i < channels.size(); ++i) {
 		 retVal.insert( channels.at(i), 0 );
 	}
@@ -87,7 +87,7 @@ void LightPresets::setBlack() {
 void LightPresets::setFull() {
 	QMap<int, int> map = m_bars->getStatus();
 	QMap<int, int> retVal;
-	QList<int> channels = map.uniqueKeys();
+	QList<int> channels = map.keys();
 	for (int i=0; i < channels.size(); ++i) {
 		 retVal.insert( channels.at(i), 100 );
 	}
@@ -144,7 +144,7 @@ void LightPresets::presetActivated() {
 
 void LightPresets::presetStep() {
 	QMap<int, int> status;
-	QList<int> channels = m_fadeEnd.uniqueKeys();
+	QList<int> channels = m_fadeEnd.keys();
 	for (int i=0; i < channels.size(); ++i) {
         if (m_bars->isFaderMaster(i))
         {
@@ -192,7 +192,7 @@ void LightPresets::savePresets()
         object["comment"] = cur->getComment();
 		
 		QMap<int, int> values = cur->getValues();
-		QList<int> channels = values.uniqueKeys();
+		QList<int> channels = values.keys();
         for (int i=0; i < channels.size(); ++i)
         {
             object[QString::number(channels.at(i))] = values.value(channels.at(i), 0);
@@ -226,6 +226,8 @@ void LightPresets::buildUp(const QJsonObject &source)
 
     addPresets(faderArray, true);
 
+	m_bars->masterChanged(ui.masterSlider->value());
+
     QFile file(m_settingsFile);
     if (file.open(QIODevice::ReadOnly) == false)
     {
@@ -237,8 +239,6 @@ void LightPresets::buildUp(const QJsonObject &source)
 
     QJsonDocument document = QJsonDocument::fromJson(settings);
     addPresets(document.array(), false);
-
-    m_bars->masterChanged(ui.masterSlider->value());
 }
 
 void LightPresets::addPresets(const QJsonArray &faderArray, bool isSystem)

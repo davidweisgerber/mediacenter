@@ -6,7 +6,7 @@
 #include <QScrollArea>
 #include "ui_lightpresets.h"
 #include "lightbars.h"
-#include <QTime>
+#include <QElapsedTimer>
 
 class Preset;
 class QTimer;
@@ -45,7 +45,7 @@ private:
 	LightBars *m_bars;
 	QScrollArea *sarea;
 	Preset *m_current;
-	QTime m_fadeCounter;
+	QElapsedTimer m_fadeCounter;
 	QMap<int, int> m_fadeStart, m_fadeEnd;
     QString m_settingsFile;
 };

@@ -1,4 +1,4 @@
-QT += widgets serialport
+QT += gui widgets serialport
 
 HEADERS +=	beamercontrol.h \
 			configuredmx.h \

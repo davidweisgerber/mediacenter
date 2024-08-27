@@ -16,7 +16,7 @@ LightBars::LightBars(char *dmxBuffer, QWidget *parent)
 
 	wid->setLayout( layout );
 	layout->setSpacing(0);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 }
 
 LightBars::~LightBars()

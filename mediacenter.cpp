@@ -1,7 +1,7 @@
 #include "mediacenter.h"
 #include <QSystemTrayIcon>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QTimer>
@@ -51,7 +51,7 @@ mediacenter::mediacenter(QWidget *parent)
 
 	connect( configDMX, SIGNAL( configured() ), lbars, SLOT( buildUp() ) );
 
-	QRect geo = qApp->desktop()->availableGeometry();
+	QRect geo = qApp->primaryScreen()->availableGeometry();
 	lbars->move( geo.width() - lbars->geometry().size().width() - 6, geo.y() );
 	lpresets->move( lbars->geometry().x() - lpresets->geometry().width() - 9, geo.y() );
     /*bcontrol->move( lbars->geometry().x() - bcontrol->geometry().width() - 9,

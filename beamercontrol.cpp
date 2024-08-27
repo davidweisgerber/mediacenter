@@ -108,7 +108,7 @@ void BeamerControl::processSerial() {
 		m_lastAction.start();
 	}
 
-	if( m_lastAction.isNull() ) {
+	if( m_lastAction.isValid() ) {
 		proceedCommandPipe();
 		m_lastAction.start();
 	}

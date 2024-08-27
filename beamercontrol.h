@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QSerialPort>
-#include <QTime>
+#include <QElapsedTimer>
 #include "ui_beamercontrol.h"
 
 class BeamerControl : public QMainWindow
@@ -43,7 +43,7 @@ private:
     QSerialPort *m_serial;
 	int m_lastCommand;
 	int m_lastStatus;
-	QTime m_lastAction;
+	QElapsedTimer m_lastAction;
 	QString m_status, m_input, m_temperature, m_lamptime, m_command;
 
 signals:
