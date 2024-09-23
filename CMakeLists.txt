@@ -52,10 +52,16 @@ qt6_add_resources(mediacenter "mediacenter"
 )
 
 if(WIN32)
+    add_definitions(-DFTD2XX_STATIC)
     target_link_libraries(mediacenter PUBLIC
-        # Remove: L${CMAKE_CURRENT_SOURCE_DIR}/./
-        ftd2xx
+            ${CMAKE_SOURCE_DIR}/ftd2xx.lib
     )
+    qt_generate_deploy_app_script(
+            TARGET mediacenter
+            OUTPUT_SCRIPT deploy_script
+            NO_UNSUPPORTED_PLATFORM_ERROR
+    )
+    install(SCRIPT ${deploy_script})
 endif()
 
 install(TARGETS mediacenter
