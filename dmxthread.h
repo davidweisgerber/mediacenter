@@ -2,7 +2,7 @@
 #define DMXTHREAD_H
 
 #include <QThread>
-#include "FTD2XX.h"
+#include "FTD2XX.H"
 
 class DMXThread : public QThread
 {

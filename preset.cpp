@@ -1,6 +1,7 @@
 #include "preset.h"
 #include <QMouseEvent>
 #include <QInputDialog>
+#include <QShortcut>
 
 Preset::Preset(int number, QWidget *parent)
 	: QWidget(parent)
@@ -11,12 +12,16 @@ Preset::Preset(int number, QWidget *parent)
 	setActivated( false );
 	m_number = number;
 	ui.number->setText( QString::number( m_number ) );
+
+	auto *shortcut = new QShortcut(QKeySequence(QString("Ctrl+%1").arg(m_number)), this, nullptr, nullptr, Qt::ApplicationShortcut);
+	connect(shortcut, &QShortcut::activated, this, [this]() {
+		setActivated(true);
+		emit activated();
+	});
 }
 
 Preset::~Preset()
-{
-
-}
+= default;
 
 void Preset::setActivated( bool activated ) {
 	if( activated ) {

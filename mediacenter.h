@@ -7,7 +7,6 @@
 #include "lightbars.h"
 #include "lightpresets.h"
 #include "beamercontrol.h"
-#include <windows.h>
 
 class QSystemTrayIcon;
 class ConfigureDMX;
@@ -41,7 +40,7 @@ private:
 
     QJsonObject m_settingsObject;
     DMXThread *m_dmxThread;
-    char m_dmxBuffer[512];
+    char m_dmxBuffer[512] = {0};
 };
 
 #endif // MEDIACENTER_H

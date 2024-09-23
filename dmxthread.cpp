@@ -3,7 +3,7 @@
 DMXThread::DMXThread(char *dmxBuffer) : QThread()
   , m_dmxConnected(false)
   , m_running(true)
-  , m_ftHandle(INVALID_HANDLE_VALUE)
+  , m_ftHandle(reinterpret_cast<FT_HANDLE>(INVALID_HANDLE_VALUE))
   , m_error()
   , m_dmxBuffer(dmxBuffer)
 {
@@ -12,6 +12,7 @@ DMXThread::DMXThread(char *dmxBuffer) : QThread()
 
 bool DMXThread::connectDMX()
 {
+#ifdef Q_OS_WIN
     if(m_dmxConnected == true)
     {
         return true;
@@ -24,7 +25,7 @@ bool DMXThread::connectDMX()
         OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL | FT_OPEN_BY_DESCRIPTION, 0);
 
     // connect to first device
-    if (m_ftHandle == INVALID_HANDLE_VALUE)
+    if (m_ftHandle == reinterpret_cast<FT_HANDLE>(INVALID_HANDLE_VALUE))
     {
         m_error = tr("No DMX device was found");
         return false;
@@ -62,6 +63,10 @@ bool DMXThread::connectDMX()
     m_dmxConnected = true;
 
     return true;
+#endif //Q_OS_WIN
+#ifdef Q_OS_LINUX
+	return false;
+#endif //Q_OS_LINUX
 }
 
 void DMXThread::disconnectDMX()
@@ -74,7 +79,9 @@ void DMXThread::disconnectDMX()
     m_dmxConnected = false;
     QThread::msleep(50);
 
+#ifdef Q_OS_WIN
     FT_W32_CloseHandle(m_ftHandle);
+#endif //Q_OS_WIN
 }
 
 const QString &DMXThread::getError()
@@ -101,10 +108,12 @@ void DMXThread::run()
         unsigned char startCode = 0;
         ULONG bytesWritten;
 
+#ifdef Q_OS_WIN
         FT_W32_EscapeCommFunction(m_ftHandle, CLRRTS);
         FT_W32_SetCommBreak(m_ftHandle);
         FT_W32_ClearCommBreak(m_ftHandle);
         FT_W32_WriteFile(m_ftHandle, &startCode, 1, &bytesWritten, NULL);
         FT_W32_WriteFile(m_ftHandle, m_dmxBuffer, 512, &bytesWritten, NULL);
+#endif //Q_OS_WIN
     }
 }

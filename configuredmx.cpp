@@ -35,7 +35,7 @@ ConfigureDMX::ConfigureDMX(QWidget *parent)
 
 ConfigureDMX::~ConfigureDMX()
 {
-
+	delete settings;
 }
 
 void ConfigureDMX::addChannel() {
