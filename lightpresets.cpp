@@ -89,7 +89,7 @@ void LightPresets::setFull() {
 	QMap<int, int> retVal;
 	QList<int> channels = map.keys();
 	for (int i=0; i < channels.size(); ++i) {
-		 retVal.insert( channels.at(i), 100 );
+		 retVal.insert( channels.at(i), 255 );
 	}
 	m_bars->setStatus( retVal );
 }
