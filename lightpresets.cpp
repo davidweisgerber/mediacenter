@@ -40,12 +40,51 @@ LightPresets::LightPresets(LightBars *bars, QWidget *parent)
 	connect( ui.blackButton, SIGNAL( clicked() ), this, SLOT( setBlack() ) );
 	connect( ui.fullPowerButton, SIGNAL( clicked() ), this, SLOT( setFull() ) );
 
+	m_httpServer.route("/get/<arg>", this, [this](const int presetNo)
+	{
+		if (presetNo > layout->count())
+		{
+			return QHttpServerResponse("application/json", "false", QHttpServerResponse::StatusCode::BadRequest);
+		}
+
+		auto* presetWidget = qobject_cast<Preset*>(layout->itemAt(presetNo-1)->widget());
+		QJsonObject object;
+		object["title"] = presetWidget->getTitle();
+		object["comment"] = presetWidget->getComment();
+		object["current"] = presetWidget == m_current;
+
+		return QHttpServerResponse("application/json", QJsonDocument(object).toJson());
+	});
+
+	m_httpServer.route("/activate/<arg>", this, [this](const int presetNo)
+	{
+		if (presetNo > layout->count())
+		{
+			return QHttpServerResponse("application/json", "false", QHttpServerResponse::StatusCode::BadRequest);
+		}
+
+		auto* presetWidget = qobject_cast<Preset*>(layout->itemAt(presetNo-1)->widget());
+		presetWidget->setActivated(true);
+		emit presetWidget->activated();
+
+		return QHttpServerResponse("application/json", "true");
+	});
+
     m_settingsFile = QDir::homePath() + QDir::separator() + "mediacenter.settings.json";
+
+	m_tcpServer = new QTcpServer(this);
+	if (m_tcpServer->listen(QHostAddress::Any, 8089) == false || m_httpServer.bind(m_tcpServer) == false)
+	{
+		delete m_tcpServer;
+
+		qCritical() << "Could not bind to port 8089";
+	}
 }
 
 LightPresets::~LightPresets()
 {
 	savePresets();
+	delete m_tcpServer;
 }
 
 void LightPresets::newPreset() {

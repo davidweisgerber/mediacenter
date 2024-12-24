@@ -7,6 +7,8 @@
 #include "ui_lightpresets.h"
 #include "lightbars.h"
 #include <QElapsedTimer>
+#include <QHttpServer>
+#include <QTcpServer>
 
 class Preset;
 class QTimer;
@@ -17,8 +19,8 @@ class LightPresets : public QMainWindow
 	Q_OBJECT
 
 public:
-	LightPresets(LightBars *bars, QWidget *parent = 0);
-	~LightPresets();
+	explicit LightPresets(LightBars *bars, QWidget *parent = 0);
+	~LightPresets() override;
 	int getMaster();
 
 public slots:
@@ -48,6 +50,9 @@ private:
 	QElapsedTimer m_fadeCounter;
 	QMap<int, int> m_fadeStart, m_fadeEnd;
     QString m_settingsFile;
+
+	QTcpServer *m_tcpServer;
+	QHttpServer m_httpServer;
 };
 
 #endif // LIGHTPRESETS_H
