@@ -11,53 +11,52 @@ LightBars::LightBars(char *dmxBuffer, QWidget *parent)
 {
 	setWindowTitle( tr("Light Faders") );
 	setGeometry( QRect( 100, 100, 1024, 1024 ) );
-	QWidget *wid = new QWidget( this );
-	layout = new QVBoxLayout( );
+	auto *wid = new QWidget(this);
+	m_layout = new QVBoxLayout();
 
-	wid->setLayout( layout );
-	layout->setSpacing(0);
-	layout->setContentsMargins(0, 0, 0, 0);
+	wid->setLayout( m_layout );
+	m_layout->setSpacing(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 }
 
 LightBars::~LightBars()
-{
-
-}
+= default;
 
 void LightBars::buildUp(const QJsonObject &source)
 {
 	QMap<int, int> status;
 	bool wasVisible = false;
 	QPoint oldpos;
-    if( isVisible() )
+
+    if (isVisible())
     {
 		wasVisible = true;
 		oldpos = pos();
 		hide();
 	}
 	
-    if( layout->count() > 0 )
+    if (m_layout->count() > 0)
     {
 		status = getStatus();
 	}
 
     QJsonArray faderArray = source["faders"].toArray();
 
-    int num_faders = faderArray.size();
+    qsizetype num_faders = faderArray.size();
 	
 	QLayoutItem *child;
-    while ((child = layout->takeAt(0)) != 0)
+    while ((child = m_layout->takeAt(0)) != nullptr)
     {
 		delete child->widget();
 		delete child;
 	}
 
-    for( int i=0; i < num_faders; i++ )
+    for(int i=0; i < num_faders; i++)
     {
         int mode = faderArray[i].toObject()["mode"].toInt(0);
         int strength = faderArray[i].toObject()["strength"].toInt(0);
 
-        LightFader *newFader = new LightFader(
+        auto *newFader = new LightFader(
             faderArray[i].toObject()["channel"].toInt(),
             faderArray[i].toObject()["name"].toString(),
             static_cast<LightFader::OperatingMode>(mode),
@@ -72,11 +71,11 @@ void LightBars::buildUp(const QJsonObject &source)
             newFader->setValue(strength, 1);
         }
 
-		layout->addWidget( newFader );
+		m_layout->addWidget( newFader );
 	}
 
-    QSize size( 210, 29*layout->count() + 29 );
-	layout->parentWidget()->resize( size );
+    QSize size( 210, 29*m_layout->count() + 29 );
+	m_layout->parentWidget()->resize( size );
 
 	setMinimumSize( size );
 	setMaximumSize( size );
@@ -99,9 +98,9 @@ void LightBars::masterChanged(int newMaster)
 {
     m_master = newMaster;
 
-    for( int i=0; i < layout->count(); i++ )
+    for( int i=0; i < m_layout->count(); i++ )
     {
-        LightFader *cur = qobject_cast<LightFader*>(layout->itemAt(i)->widget());
+        auto *cur = qobject_cast<LightFader*>(m_layout->itemAt(i)->widget());
         cur->setMasterValue(newMaster);
     }
 }
@@ -110,48 +109,50 @@ QMap<int, int> LightBars::getStatus()
 {
 	QMap<int, int> retVal;
 
-    for( int i=0; i < layout->count(); i++ )
+    for( int i=0; i < m_layout->count(); i++ )
     {
-        LightFader *cur = qobject_cast<LightFader*>(layout->itemAt(i)->widget());
+        auto *cur = qobject_cast<LightFader*>(m_layout->itemAt(i)->widget());
         int startChannel = cur->getStartChannel();
         QVector<int> values = cur->getValues();
 
-        for (int i=0; i < values.size(); i++)
+        for (int j=0; i < values.size(); i++)
         {
-            retVal.insert(startChannel + i, values[i]);
+            retVal.insert(startChannel + j, values[j]);
         }
 	}
 
 	return retVal;
 }
 
-void LightBars::setStatus( QMap<int, int> status )
+void LightBars::setStatus(const QMap<int, int>& status)
 {
-    for( int i=0; i < layout->count(); i++ )
+    for( int i=0; i < m_layout->count(); i++ )
     {
-        LightFader *cur = qobject_cast<LightFader*>(layout->itemAt(i)->widget());
-        int numberOfChannels = cur->getValues().size();
+        auto *cur = qobject_cast<LightFader*>(m_layout->itemAt(i)->widget());
+        qsizetype numberOfChannels = cur->getValues().size();
 
-        for (int i=0; i < numberOfChannels; i++)
+        for (int j=0; i < numberOfChannels; i++)
         {
-            cur->setValue(status.value(cur->getStartChannel() + i, 0), i);
+            cur->setValue(status.value(cur->getStartChannel() + j, 0), j);
         }
     }
 }
 
 bool LightBars::isFaderMaster(int channel)
 {
-    for( int i=0; i < layout->count(); i++ )
+    for( int i=0; i < m_layout->count(); i++ )
     {
-        LightFader *cur = qobject_cast<LightFader*>(layout->itemAt(i)->widget());
-        if (cur->getMode() == LightFader::SINGLE_CHANNEL && channel == cur->getStartChannel())
-        {
-            return true;
-        }
-        else if (cur->getMode() == LightFader::EUROLITE_PMD_8 && channel == cur->getStartChannel() + 1)
-        {
-            return true;
-        }
+        auto *cur = qobject_cast<LightFader*>(m_layout->itemAt(i)->widget());
+
+		if (cur->getMode() == LightFader::SINGLE_CHANNEL && channel == cur->getStartChannel())
+		{
+		    return true;
+		}
+
+    	if (cur->getMode() == LightFader::EUROLITE_PMD_8 && channel == cur->getStartChannel() + 1)
+		{
+		    return true;
+		}
     }
 
     return false;

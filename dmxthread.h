@@ -7,7 +7,7 @@
 class DMXThread : public QThread
 {
 public:
-    DMXThread(char *dmxBuffer);
+    explicit DMXThread(char *dmxBuffer);
 
     bool connectDMX();
     void disconnectDMX();
@@ -15,8 +15,7 @@ public:
     void quitThread();
 
 protected:
-    virtual void run() override;
-
+    void run() override;
 
 private:
     bool m_dmxConnected;

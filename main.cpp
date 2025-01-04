@@ -1,11 +1,11 @@
 #include <QApplication>
-#include "mediacenter.h"
+#include "Mediacenter.h"
 
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
     a.setStyle("fusion");
-	mediacenter w;
+	Mediacenter w;
 	a.setQuitOnLastWindowClosed( false );
 	return a.exec();
 }

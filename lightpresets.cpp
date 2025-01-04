@@ -7,7 +7,6 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
-#include <QFile>
 #include <QDir>
 
 
@@ -17,37 +16,37 @@ LightPresets::LightPresets(LightBars *bars, QWidget *parent)
 	ui.setupUi(this);
 	m_bars = bars;
 
-	m_current = 0;
-	sarea = new QScrollArea( this );
-	sarea->setGeometry( 190, 5, 605, 91 );
-	sarea->setWidgetResizable( false );
-	sarea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
+	m_current = nullptr;
+	m_scrollArea = new QScrollArea( this );
+	m_scrollArea->setGeometry( 190, 5, 605, 91 );
+	m_scrollArea->setWidgetResizable( false );
+	m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
 
-	QWidget *base = new QWidget( this );
-	layout = new QHBoxLayout();
-	layout->setSizeConstraint( QLayout::SetFixedSize );
-	layout->setSpacing( 2 );
-	layout->setContentsMargins( 1, 1, 1, 1 );
+	auto *base = new QWidget( this );
+	m_layout = new QHBoxLayout();
+	m_layout->setSizeConstraint( QLayout::SetFixedSize );
+	m_layout->setSpacing( 2 );
+	m_layout->setContentsMargins( 1, 1, 1, 1 );
 
-	base->setLayout( layout );
-	sarea->setWidget( base );
+	base->setLayout( m_layout );
+	m_scrollArea->setWidget( base );
 
-	connect( ui.masterDial, SIGNAL( valueChanged ( int ) ), this, SLOT( timerChanged( int ) ) );
-	connect( ui.masterSlider, SIGNAL( valueChanged ( int ) ), this, SLOT( masterChanged( int ) ) );
-	connect( ui.saveNewButton, SIGNAL( clicked() ), this, SLOT( newPreset() ) );
-	connect( ui.overWriteButton, SIGNAL( clicked() ), this, SLOT( overwritePreset() ) );
-	connect( ui.deleteButton, SIGNAL( clicked() ), this, SLOT( deletePreset() ) );
-	connect( ui.blackButton, SIGNAL( clicked() ), this, SLOT( setBlack() ) );
-	connect( ui.fullPowerButton, SIGNAL( clicked() ), this, SLOT( setFull() ) );
+	connect( ui.masterDial, &QDial::valueChanged, this, &LightPresets::timerChanged);
+	connect( ui.masterSlider, &QSlider::valueChanged, this, &LightPresets::masterChanged);
+	connect( ui.saveNewButton, &QAbstractButton::clicked, this, &LightPresets::newPreset);
+	connect( ui.overWriteButton, &QAbstractButton::clicked, this, &LightPresets::overwritePreset);
+	connect( ui.deleteButton, &QAbstractButton::clicked, this, &LightPresets::deletePreset);
+	connect( ui.blackButton, &QAbstractButton::clicked, this, &LightPresets::setBlack);
+	connect( ui.fullPowerButton, &QAbstractButton::clicked, this, &LightPresets::setFull);
 
 	m_httpServer.route("/get/<arg>", this, [this](const int presetNo)
 	{
-		if (presetNo > layout->count())
+		if (presetNo > m_layout->count())
 		{
 			return QHttpServerResponse("application/json", "false", QHttpServerResponse::StatusCode::BadRequest);
 		}
 
-		auto* presetWidget = qobject_cast<Preset*>(layout->itemAt(presetNo-1)->widget());
+		auto* presetWidget = qobject_cast<Preset*>(m_layout->itemAt(presetNo-1)->widget());
 		QJsonObject object;
 		object["title"] = presetWidget->getTitle();
 		object["comment"] = presetWidget->getComment();
@@ -58,12 +57,12 @@ LightPresets::LightPresets(LightBars *bars, QWidget *parent)
 
 	m_httpServer.route("/activate/<arg>", this, [this](const int presetNo)
 	{
-		if (presetNo > layout->count())
+		if (presetNo > m_layout->count())
 		{
 			return QHttpServerResponse("application/json", "false", QHttpServerResponse::StatusCode::BadRequest);
 		}
 
-		auto* presetWidget = qobject_cast<Preset*>(layout->itemAt(presetNo-1)->widget());
+		auto* presetWidget = qobject_cast<Preset*>(m_layout->itemAt(presetNo-1)->widget());
 		presetWidget->setActivated(true);
 		emit presetWidget->activated();
 
@@ -88,12 +87,14 @@ LightPresets::~LightPresets()
 }
 
 void LightPresets::newPreset() {
-	Preset *p = new Preset( layout->count() + 1, sarea->widget() );
-	layout->addWidget( p );
-	connect( p, SIGNAL( activated() ), this, SLOT( presetActivated() ) );
+	auto *p = new Preset( m_layout->count() + 1, m_scrollArea->widget() );
+	m_layout->addWidget( p );
+	connect( p, &Preset::activated, this, &LightPresets::presetActivated);
 	p->rename();
-	for( int i=0; i < layout->count(); i++ ) {
-		Preset *cur = (Preset*)layout->itemAt(i)->widget();
+
+	for(int i=0; i < m_layout->count(); i++)
+	{
+		auto *cur = qobject_cast<Preset*>(m_layout->itemAt(i)->widget());
 		cur->setActivated( false );
 	}
 	m_current = p;
@@ -104,7 +105,8 @@ void LightPresets::newPreset() {
 }
 
 void LightPresets::overwritePreset() {
-	if( !m_current ) {
+	if(m_current == nullptr)
+	{
 		return;
 	}
 
@@ -113,63 +115,80 @@ void LightPresets::overwritePreset() {
 	savePresets();
 }
 
-void LightPresets::setBlack() {
+void LightPresets::setBlack() const
+{
 	QMap<int, int> map = m_bars->getStatus();
 	QMap<int, int> retVal;
 	QList<int> channels = map.keys();
-	for (int i=0; i < channels.size(); ++i) {
-		 retVal.insert( channels.at(i), 0 );
+
+	for (int channel : channels)
+	{
+		 retVal.insert( channel, 0 );
 	}
 	m_bars->setStatus( retVal );
 }
 
-void LightPresets::setFull() {
+void LightPresets::setFull() const
+{
 	QMap<int, int> map = m_bars->getStatus();
 	QMap<int, int> retVal;
 	QList<int> channels = map.keys();
-	for (int i=0; i < channels.size(); ++i) {
-		 retVal.insert( channels.at(i), 255 );
+
+	for (int channel : channels)
+	{
+		 retVal.insert( channel, 255 );
 	}
-	m_bars->setStatus( retVal );
+	m_bars->setStatus(retVal);
 }
 
-void LightPresets::deletePreset() {
-	if( !m_current ) {
+void LightPresets::deletePreset()
+{
+	if(m_current == nullptr)
+	{
 		return;
 	}
 
-	for( int i=0; i < layout->count(); i++ ) {
-		Preset *cur = (Preset*)layout->itemAt(i)->widget();
-		if( cur == m_current ) {
+	for (int i=0; i < m_layout->count(); i++)
+	{
+		auto *cur = qobject_cast<Preset*>(m_layout->itemAt(i)->widget());
+		if (cur == m_current)
+		{
 			delete cur;
-			m_current = 0;
+			m_current = nullptr;
 			break;
 		}
 	}
 
-	for( int i=0; i < layout->count(); i++ ) {
-		Preset *cur = (Preset*)layout->itemAt(i)->widget();
+	for( int i=0; i < m_layout->count(); i++ )
+	{
+		auto *cur = qobject_cast<Preset*>(m_layout->itemAt(i)->widget());
 		cur->setNumber( i+1 );
 	}
 
 	savePresets();
 }
 
-void LightPresets::timerChanged( int time ) {
-	timerValue = exp( (double)time/10 ) / 100;
-	ui.masterTimer->setText( QString::number( timerValue ) + "s" );
+void LightPresets::timerChanged( int time )
+{
+	m_timerValue = exp(static_cast<double>(time)/10.0) / 100.0;
+	ui.masterTimer->setText(QString::number( m_timerValue ) + "s" );
 }
 
-void LightPresets::masterChanged( int strength ) {
+void LightPresets::masterChanged(int strength) const
+{
 	ui.masterStrength->setText( QString::number( strength ) + "%" );
     m_bars->masterChanged(strength);
 }
 
-void LightPresets::presetActivated() {
-	Preset *p = (Preset*) sender();
-	for( int i=0; i < layout->count(); i++ ) {
-		Preset *cur = (Preset*)layout->itemAt(i)->widget();
-		if( p !=  cur ) {
+void LightPresets::presetActivated()
+{
+	auto *p = qobject_cast<Preset*>(sender());
+
+	for( int i=0; i < m_layout->count(); i++ )
+	{
+		auto *cur = qobject_cast<Preset*>(m_layout->itemAt(i)->widget());
+		if (p !=  cur)
+		{
 			cur->setActivated( false );
 			cur->update();
 		}
@@ -181,15 +200,17 @@ void LightPresets::presetActivated() {
 	presetStep();
 }
 
-void LightPresets::presetStep() {
+void LightPresets::presetStep()
+{
 	QMap<int, int> status;
-	QList<int> channels = m_fadeEnd.keys();
-	for (int i=0; i < channels.size(); ++i) {
+	const QList<int> channels = m_fadeEnd.keys();
+	for (int i=0; i < channels.size(); ++i)
+	{
         if (m_bars->isFaderMaster(i))
         {
-            status[channels.at(i)] = m_fadeStart[channels.at(i)] +
-                (double)( m_fadeEnd[channels.at(i)] - m_fadeStart[channels.at(i)] ) *
-                (double)( (double)m_fadeCounter.elapsed() / (double)(timerValue * 1000) );
+            status[channels.at(i)] = static_cast<int>(m_fadeStart[channels.at(i)] +
+                static_cast<double>(m_fadeEnd[channels.at(i)] - m_fadeStart[channels.at(i)]) *
+                (static_cast<double>(m_fadeCounter.elapsed()) / (m_timerValue * 1000.0)));
         }
         else
         {
@@ -199,18 +220,23 @@ void LightPresets::presetStep() {
 
 	m_bars->setStatus( status );
 
-	if( m_fadeCounter.elapsed() < timerValue * 1000.0 ) {
-		QTimer::singleShot( 25, this, SLOT( presetStep() ) );
-	} else {
+	if(static_cast<double>(m_fadeCounter.elapsed()) < m_timerValue * 1000.0 )
+	{
+		QTimer::singleShot( 25, this, &LightPresets::presetStep);
+	}
+	else
+	{
 		m_bars->setStatus( m_fadeEnd );
     }
 }
 
-void LightPresets::showToggle() {
+void LightPresets::showToggle()
+{
 	setVisible( !isVisible() );
 }
 
-int LightPresets::getMaster() {
+int LightPresets::getMaster() const
+{
 	return ui.masterSlider->value();
 }
 
@@ -218,9 +244,9 @@ void LightPresets::savePresets()
 {
     QJsonArray array;
 
-    for( int i=0; i < layout->count(); i++ )
+    for (int i=0; i < m_layout->count(); i++)
     {
-        Preset *cur = (Preset*)layout->itemAt(i)->widget();
+        auto *cur = qobject_cast<Preset*>(m_layout->itemAt(i)->widget());
         if (cur->isSystem())
         {
             continue;
@@ -232,9 +258,9 @@ void LightPresets::savePresets()
 		
 		QMap<int, int> values = cur->getValues();
 		QList<int> channels = values.keys();
-        for (int i=0; i < channels.size(); ++i)
+        for (int channel : channels)
         {
-            object[QString::number(channels.at(i))] = values.value(channels.at(i), 0);
+            object[QString::number(channel)] = values.value(channel, 0);
 		}
 
         array.append(object);
@@ -260,8 +286,8 @@ void LightPresets::buildUp(const QJsonObject &source)
     timerValue = log(timerValue * 100) * 10;
     //timerValue = exp( (double)time/10 ) / 100;
 
-    timerChanged(timerValue);
-    ui.masterDial->setValue(timerValue);
+    timerChanged(static_cast<int>(timerValue));
+    ui.masterDial->setValue(static_cast<int>(timerValue));
 
     addPresets(faderArray, true);
 
@@ -273,22 +299,22 @@ void LightPresets::buildUp(const QJsonObject &source)
         return;
     }
 
-    QByteArray settings = file.readAll();
+    const QByteArray settings = file.readAll();
     file.close();
 
-    QJsonDocument document = QJsonDocument::fromJson(settings);
+    const QJsonDocument document = QJsonDocument::fromJson(settings);
     addPresets(document.array(), false);
 }
 
 void LightPresets::addPresets(const QJsonArray &faderArray, bool isSystem)
 {
-    int numberOfPresets = faderArray.size();
+    const qsizetype numberOfPresets = faderArray.size();
     for (int i=0; i < numberOfPresets; i++)
     {
-        Preset *p = new Preset( layout->count() + 1, sarea->widget() );
+        auto *p = new Preset( m_layout->count() + 1, m_scrollArea->widget() );
         p->setSystem(isSystem);
-        layout->addWidget( p );
-        connect( p, SIGNAL( activated() ), this, SLOT( presetActivated() ) );
+        m_layout->addWidget( p );
+        connect( p, &Preset::activated, this, &LightPresets::presetActivated);
 
         p->setTitle(faderArray[i].toObject()["title"].toString());
         p->setComment(faderArray[i].toObject()["comment"].toString());

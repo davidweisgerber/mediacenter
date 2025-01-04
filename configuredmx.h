@@ -1,7 +1,6 @@
 #ifndef CONFIGUREDMX_H
 #define CONFIGUREDMX_H
 
-#include <QDialog>
 #include <QSettings>
 #include "ui_configuredmx.h"
 #include <QListWidgetItem>
@@ -11,8 +10,8 @@ class ConfigureDMX : public QDialog
 	Q_OBJECT
 
 public:
-	ConfigureDMX(QWidget *parent = 0);
-	~ConfigureDMX();
+	explicit ConfigureDMX(QWidget *parent = nullptr);
+	~ConfigureDMX() override;
 
 private slots:
 	void addChannel();
@@ -28,9 +27,9 @@ signals:
 	void configured();
 
 private:
-	bool deleteProc;
-	QSettings *settings;
-	Ui::ConfigureDMXClass ui;
+	bool m_deleteProc = false;
+	QSettings *m_settings = nullptr;
+	Ui::ConfigureDMXClass ui{};
 };
 
 #endif // CONFIGUREDMX_H

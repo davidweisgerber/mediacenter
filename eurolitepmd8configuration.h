@@ -6,8 +6,9 @@
 class LightFader;
 class QColor;
 
-namespace Ui {
-class EuroLitePMD8Configuration;
+namespace Ui
+{
+    class EuroLitePMD8Configuration;
 }
 
 class EuroLitePMD8Configuration : public QDialog
@@ -15,8 +16,8 @@ class EuroLitePMD8Configuration : public QDialog
     Q_OBJECT
 
 public:
-    explicit EuroLitePMD8Configuration(LightFader *parentFader, QWidget *parent = 0);
-    ~EuroLitePMD8Configuration();
+    explicit EuroLitePMD8Configuration(LightFader *parentFader, QWidget *parent = nullptr);
+    ~EuroLitePMD8Configuration() override;
 
 private slots:
     void changeColorPressed();

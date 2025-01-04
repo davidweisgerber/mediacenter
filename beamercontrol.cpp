@@ -5,11 +5,12 @@
 #include <QSettings>
 
 BeamerControl::BeamerControl(QWidget *parent)
-	: QMainWindow(parent, Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint | Qt::WindowTitleHint)
+	:QMainWindow(parent, Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint | Qt::WindowTitleHint)
+	,ui()
 {
 	ui.setupUi(this);
 
-	m_serial = 0;
+	m_serial = nullptr;
 
     /*connect( ui.onButton, SIGNAL( clicked() ), this, SLOT( powerOn() ) );
 	connect( ui.offButton, SIGNAL( clicked() ), this, SLOT( powerOff() ) );
@@ -24,14 +25,32 @@ BeamerControl::BeamerControl(QWidget *parent)
 }
 
 BeamerControl::~BeamerControl()
-{
+= default;
 
+QString BeamerControl::getStatus()
+{
+	return m_status;
 }
 
-void BeamerControl::initialize() {
-	if( m_serial ) {
-		delete m_serial;
-	}
+QString BeamerControl::getTemperature()
+{
+	return m_temperature;
+}
+
+QString BeamerControl::getLampTime()
+{
+	return m_lamptime;
+}
+
+QString BeamerControl::getInput()
+{
+	return m_input;
+}
+
+void BeamerControl::initialize()
+{
+	delete m_serial;
+
 
 	QSettings settings( QSettings::SystemScope, "FEGMM", "mediacenter" );
     m_serial = new QSerialPort( settings.value( "beamerport", "COM3" ).toString() );
@@ -47,38 +66,48 @@ void BeamerControl::initialize() {
     }*/
 }
 
-
-void BeamerControl::powerOn() {
+void BeamerControl::powerOn()
+{
 	m_command = "C00\r\n";
 }
 
-void BeamerControl::powerOff() {
+void BeamerControl::powerOff()
+{
 	m_command = "C01\r\n";
 }
 
-void BeamerControl::input1() {
+void BeamerControl::input1()
+{
 	m_command = "C05\r\n";
 }
 
-void BeamerControl::input2() {
+void BeamerControl::input2()
+{
 	m_command = "C06\r\n";
 }
 
-void BeamerControl::input3() {
+void BeamerControl::input3()
+{
 	m_command = "C07\r\n";
 }
 
-void BeamerControl::input4() {
+void BeamerControl::input4()
+{
 	m_command = "C08\r\n";
 }
 
-void BeamerControl::processSerial() {
+void BeamerControl::processSerial()
+{
 	char buf[100];
-	int size;
-	if( 0 != (size = m_serial->read( buf, 100 ) ) ) {
+	qint64 size = m_serial->read(buf, sizeof(buf));
+
+	if(0 != size)
+	{
 		m_lastAction.start();
 		buf[size] = 0;
-		switch( m_lastCommand ) {
+
+		switch( m_lastCommand )
+		{
 			case 0:
 				break;
 			case 1:
@@ -96,35 +125,43 @@ void BeamerControl::processSerial() {
 			case 5:
 				processCommandFeedback( buf );
 				break;
+			default:
+				break;
 		}
 
 		m_serial->flush();
 	}
 
-	if( m_lastAction.elapsed() > 3000 ) {
+	if( m_lastAction.elapsed() > 3000 )
+	{
 		processStatus("-1");
 		m_lastCommand = 0;
 		proceedCommandPipe();
 		m_lastAction.start();
 	}
 
-	if( m_lastAction.isValid() ) {
+	if( m_lastAction.isValid() )
+	{
 		proceedCommandPipe();
 		m_lastAction.start();
 	}
 
-	QTimer::singleShot( 1000, this, SLOT( processSerial() ) );
+	QTimer::singleShot( 1000, this, &BeamerControl::processSerial);
 }
 
-void BeamerControl::processStatus( QString buf ) {
+void BeamerControl::processStatus(const QString& buf)
+{
 	bool ok;
-	int status = buf.toInt( &ok );
-	if( status != m_lastStatus && ok ) {
+	int status = buf.toInt(&ok);
+
+	if(status != m_lastStatus && ok == true)
+	{
 		m_lastStatus = status;
 		QString statusString;
 		bool bad = false;
 
-		switch( status ) {
+		switch( status )
+		{
 			case -1:
 				statusString = tr("Beamer disconnected");
 				break;
@@ -162,12 +199,18 @@ void BeamerControl::processStatus( QString buf ) {
 				statusString = tr("Standby after Lamp Failure");
 				bad = true;
 				break;
+			default:
+				statusString = tr("Unknown status: ") + QString::number( status );
+				bad = true;
+				break;
 		}
 		m_status = statusString;
 		
-		if( bad ) {
+		if( bad )
+		{
 			emit badThing();
-		} else {
+		} else
+		{
 			emit stateChanged( statusString );
 		}
 
@@ -180,12 +223,16 @@ void BeamerControl::processStatus( QString buf ) {
 	proceedCommandPipe();
 }
 
-void BeamerControl::proceedCommandPipe() {
-	if( !m_command.isEmpty() ) {
-		m_serial->write( m_command.toLatin1() );
+void BeamerControl::proceedCommandPipe()
+{
+	if(!m_command.isEmpty() )
+	{
+		m_serial->write(m_command.toLatin1());
 		m_lastCommand = 5;
 		m_command = "";
-	} else {
+	}
+	else
+	{
 		switch( m_lastCommand ) {
 			case 1:
 				m_serial->write("CR1\r\n");
@@ -209,10 +256,13 @@ void BeamerControl::proceedCommandPipe() {
 
 
 
-void BeamerControl::processInput( QString buf ) {
+void BeamerControl::processInput(const QString& buf)
+{
 	int input = buf.toInt();
 	QString inputText;
-	switch( input ) {
+
+	switch(input)
+	{
 		case 1:
 			inputText = tr("Input 1: VGA or DVI");
 			break;
@@ -231,7 +281,8 @@ void BeamerControl::processInput( QString buf ) {
 	proceedCommandPipe();
 }
 
-void BeamerControl::processLampTime( QString buf ) {
+void BeamerControl::processLampTime(QString buf)
+{
 	buf += tr("h");
 	m_lamptime = buf;
 	ui.lampLabel->setText( tr("Lamp life time: ") + buf );
@@ -239,21 +290,25 @@ void BeamerControl::processLampTime( QString buf ) {
 	proceedCommandPipe();
 }
 
-void BeamerControl::processTemperature( QString buf ) {
+void BeamerControl::processTemperature(const QString& buf)
+{
 	m_temperature = buf;
 	ui.temperatureLabel->setText( tr("Temperature: ") + buf );
 
 	proceedCommandPipe();
 }
 
-void BeamerControl::processCommandFeedback( QString buf ) {
-	if( buf == "?" ) {
+void BeamerControl::processCommandFeedback(const QString& buf)
+{
+	if( buf == "?" )
+	{
 		QMessageBox::critical( this, tr("Beamer Problem"), tr("Could not process the last command.") );
 	}
 
 	proceedCommandPipe();
 }
 
-void BeamerControl::showToggle() {
+void BeamerControl::showToggle()
+{
 	setVisible( !isVisible() );
 }

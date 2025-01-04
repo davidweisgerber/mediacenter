@@ -27,7 +27,7 @@ qt_add_executable(mediacenter WIN32 MACOSX_BUNDLE
     lightfader.cpp lightfader.h lightfader.ui
     lightpresets.cpp lightpresets.h lightpresets.ui
     main.cpp
-    mediacenter.cpp mediacenter.h mediacenter.ui
+        Mediacenter.cpp Mediacenter.h mediacenter.ui
     preset.cpp preset.h preset.ui
 )
 target_link_libraries(mediacenter PUBLIC

@@ -19,9 +19,9 @@ class LightPresets : public QMainWindow
 	Q_OBJECT
 
 public:
-	explicit LightPresets(LightBars *bars, QWidget *parent = 0);
+	explicit LightPresets(LightBars *bars, QWidget *parent = nullptr);
 	~LightPresets() override;
-	int getMaster();
+	[[nodiscard]] int getMaster() const;
 
 public slots:
 	void showToggle();
@@ -30,28 +30,29 @@ public slots:
 
 private slots:
 	void timerChanged( int time );
-	void masterChanged( int strength );
+	void masterChanged( int strength ) const;
 	void presetActivated();
 	void newPreset();
 	void overwritePreset();
 	void deletePreset();
-	void setBlack();
-	void setFull();
+	void setBlack() const;
+	void setFull() const;
 	void presetStep();
     void addPresets(const QJsonArray &array, bool isSystem);
 
 private:
-	Ui::LightPresetsClass ui;
-	double timerValue;
-	QHBoxLayout *layout;
-	LightBars *m_bars;
-	QScrollArea *sarea;
-	Preset *m_current;
+	Ui::LightPresetsClass ui{};
+	double m_timerValue = 0.0;
+	QHBoxLayout *m_layout = nullptr;
+	LightBars *m_bars = nullptr;
+	QScrollArea *m_scrollArea = nullptr;
+	Preset *m_current = nullptr;
 	QElapsedTimer m_fadeCounter;
-	QMap<int, int> m_fadeStart, m_fadeEnd;
+	QMap<int, int> m_fadeStart;
+	QMap<int, int> m_fadeEnd;
     QString m_settingsFile;
 
-	QTcpServer *m_tcpServer;
+	QTcpServer *m_tcpServer = nullptr;
 	QHttpServer m_httpServer;
 };
 

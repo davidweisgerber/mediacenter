@@ -4,8 +4,7 @@
 #include <QShortcut>
 
 Preset::Preset(int number, QWidget *parent)
-	: QWidget(parent)
-    , m_isSystem(false)
+	:QWidget(parent)
 {
 	ui.setupUi(this);
 	setAutoFillBackground( true );
@@ -14,7 +13,8 @@ Preset::Preset(int number, QWidget *parent)
 	ui.number->setText( QString::number( m_number ) );
 
 	auto *shortcut = new QShortcut(QKeySequence(QString("Ctrl+%1").arg(m_number)), this, nullptr, nullptr, Qt::ApplicationShortcut);
-	connect(shortcut, &QShortcut::activated, this, [this]() {
+	connect(shortcut, &QShortcut::activated, this, [this]()
+	{
 		setActivated(true);
 		emit activated();
 	});
@@ -23,45 +23,58 @@ Preset::Preset(int number, QWidget *parent)
 Preset::~Preset()
 = default;
 
-void Preset::setActivated( bool activated ) {
-	if( activated ) {
+void Preset::setActivated(bool activated)
+{
+	if (activated)
+	{
 		QPalette p=palette();
 		p.setColor(backgroundRole(), QColor( 118, 192, 255 ));
 		setPalette(p);
-	} else {
+	}
+	else
+	{
 		QPalette p=palette();
 		p.setColor(backgroundRole(), QColor( 240, 240, 255 ));
 		setPalette(p);
 	}
 }
 
-void Preset::mouseReleaseEvent( QMouseEvent * event ) {
-	if( event->button() == Qt::LeftButton ) {
+void Preset::mouseReleaseEvent(QMouseEvent *event)
+{
+	if (event->button() == Qt::LeftButton)
+	{
 		setActivated( true );
 		emit activated();
-	} else if( event->button() == Qt::RightButton ) {
+	}
+	else if (event->button() == Qt::RightButton)
+	{
 		rename();
 	}
 }
 
-void Preset::setValues( QMap<int, int> values ) {
+void Preset::setValues(const QMap<int, int>& values)
+{
 	m_values = values;
 }
 
-QMap<int, int> Preset::getValues() {
+const QMap<int, int>& Preset::getValues() const
+{
 	return m_values;
 }
 
-void Preset::setNumber( int number ) {
+void Preset::setNumber(int number)
+{
 	m_number = number;
 	ui.number->setText( QString::number( m_number ) );
 }
 
-void Preset::setTitle( QString title ) {
+void Preset::setTitle(const QString& title)
+{
 	ui.header->setText( title );
 }
 
-void Preset::setComment( QString comment ) {
+void Preset::setComment(const QString& comment)
+{
     ui.comment->setText( comment );
 }
 
@@ -70,23 +83,27 @@ void Preset::setSystem(bool isSystem)
     m_isSystem = isSystem;
 }
 
-QString Preset::getTitle() {
+QString Preset::getTitle() const
+{
 	return ui.header->text();
 }
-QString Preset::getComment() {
+QString Preset::getComment() const
+{
 	return ui.comment->text();
 }
 
-int Preset::getNumber() {
+int Preset::getNumber() const
+{
     return m_number;
 }
 
-bool Preset::isSystem()
+bool Preset::isSystem() const
 {
     return m_isSystem;
 }
 
-void Preset::rename() {
+void Preset::rename()
+{
 	ui.header->setText( 
 		QInputDialog::getText( this, tr("Preset Title"), tr("Title of the preset:"), QLineEdit::Normal,
 			ui.header->text() ) );

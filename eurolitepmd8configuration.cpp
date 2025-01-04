@@ -122,7 +122,7 @@ void EuroLitePMD8Configuration::buildLabels()
     for (int i=1; i <= 8; i++)
     {
         const int start = ((i-1) * 3) + 3;
-        QLabel *label = qobject_cast<QLabel *>(findChild<QLabel *>(QString("colorLabel%1").arg(i)));
+        auto *label = qobject_cast<QLabel *>(findChild<QLabel *>(QString("colorLabel%1").arg(i)));
         label->setText(QString("R: %1\tG: %2\tB: %3").arg(values[start]).arg(values[start+1]).arg(values[start+2]));
     }
 }

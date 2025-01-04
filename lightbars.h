@@ -12,10 +12,10 @@ class LightBars : public QMainWindow
 	Q_OBJECT
 
 public:
-    LightBars(char *dmxBuffer,  QWidget *parent = 0);
-	~LightBars();
+    explicit LightBars(char *dmxBuffer,  QWidget *parent = nullptr);
+	~LightBars() override;
 	QMap<int, int>getStatus();
-	void setStatus( QMap<int, int> status );
+	void setStatus(const QMap<int, int>& status);
     bool isFaderMaster(int channel);
 
 public slots:
@@ -24,9 +24,9 @@ public slots:
     void masterChanged(int newMaster);
 
 private:
-	QVBoxLayout *layout;
-    char *m_dmxBuffer;
-    int m_master;
+	QVBoxLayout *m_layout = nullptr;
+    char *m_dmxBuffer = nullptr;
+    int m_master = 0;
 };
 
 #endif // LIGHTBARS_H

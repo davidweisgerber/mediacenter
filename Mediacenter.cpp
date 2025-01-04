@@ -1,4 +1,4 @@
-#include "mediacenter.h"
+#include "Mediacenter.h"
 #include <QSystemTrayIcon>
 #include <QApplication>
 #include <QScreen>
@@ -13,9 +13,8 @@
 #include "configuredmx.h"
 #include "dmxthread.h"
 
-
-mediacenter::mediacenter(QWidget *parent)
-    : QMainWindow(parent)
+Mediacenter::Mediacenter(QWidget *parent)
+    :QMainWindow(parent)
 {
     memset(m_dmxBuffer, 0, 512);
     m_dmxThread = new DMXThread(m_dmxBuffer);
@@ -27,33 +26,33 @@ mediacenter::mediacenter(QWidget *parent)
     }
 
     QJsonParseError error;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(file.readAll(), &error);
+    const QJsonDocument jsonDoc = QJsonDocument::fromJson(file.readAll(), &error);
     file.close();
 
     m_settingsObject = jsonDoc.object();
 
-    lbars = new LightBars(m_dmxBuffer, this);
-    lbars->buildUp(m_settingsObject);
-	lbars->show();
+    m_lightBars = new LightBars(m_dmxBuffer, this);
+    m_lightBars->buildUp(m_settingsObject);
+	m_lightBars->show();
 
-	lpresets = new LightPresets( lbars, this );
-    lpresets->buildUp(m_settingsObject);
-	lpresets->show();
+	m_lightPresets = new LightPresets( m_lightBars, this );
+    m_lightPresets->buildUp(m_settingsObject);
+	m_lightPresets->show();
 
     /*bcontrol = new BeamerControl( this );
 	connect( bcontrol, SIGNAL( stateChanged( QString ) ), this, SLOT( beamerStateChange( QString ) ) );
 	connect( bcontrol, SIGNAL( updateStatus() ), this, SLOT( setSystrayToolTip() ) );
     bcontrol->show();*/
-    bcontrol = nullptr;
+    m_beamerControl = nullptr;
 
-	configDMX = new ConfigureDMX( this );
-    configDMX->setWindowIcon(QIcon(QPixmap(QString("://on.xpm"))));
+	m_configureDMX = new ConfigureDMX( this );
+    m_configureDMX->setWindowIcon(QIcon(QPixmap(QString("://on.xpm"))));
 
-	connect( configDMX, SIGNAL( configured() ), lbars, SLOT( buildUp() ) );
+	//connect( m_configureDMX, &ConfigureDMX::configured, m_lightBars, SLOT( buildUp() ) );
 
 	QRect geo = qApp->primaryScreen()->availableGeometry();
-	lbars->move( geo.width() - lbars->geometry().size().width() - 6, geo.y() );
-	lpresets->move( lbars->geometry().x() - lpresets->geometry().width() - 9, geo.y() );
+	m_lightBars->move( geo.width() - m_lightBars->geometry().size().width() - 6, geo.y() );
+	m_lightPresets->move( m_lightBars->geometry().x() - m_lightPresets->geometry().width() - 9, geo.y() );
     /*bcontrol->move( lbars->geometry().x() - bcontrol->geometry().width() - 9,
         lpresets->geometry().y() + lpresets->geometry().height() + 3);*/
 
@@ -62,35 +61,35 @@ mediacenter::mediacenter(QWidget *parent)
     m_systray = new QSystemTrayIcon(QIcon(QString("://off.xpm")), this);
     m_systray->show();
 
-	QMenu *menu = new QMenu();
-	menu->addAction( tr("Connect DMX"), this, SLOT( connectDMX() ) );
-	menu->addAction( tr("Disconnect DMX"), this, SLOT( disconnectDMX() ) );
+	auto *menu = new QMenu(this);
+	menu->addAction( tr("Connect DMX"), this, &Mediacenter::connectDMX);
+	menu->addAction( tr("Disconnect DMX"), this, &Mediacenter::disconnectDMX);
 	menu->addSeparator();
-	menu->addAction( tr("Show All"), this, SLOT(showAllControls()) );
-	menu->addAction( tr("Hide All"), this, SLOT(hideAllControls()) );
+	menu->addAction( tr("Show All"), this, &Mediacenter::showAllControls);
+	menu->addAction( tr("Hide All"), this, &Mediacenter::hideAllControls);
 	menu->addSeparator();
-	menu->addAction( tr("Show/Hide Light Bars"), lbars, SLOT( showToggle() ) );
-	menu->addAction( tr("Show/Hide Light Presets"), lpresets, SLOT( showToggle() ) );
+	menu->addAction( tr("Show/Hide Light Bars"), m_lightBars, &LightBars::showToggle);
+	menu->addAction( tr("Show/Hide Light Presets"), m_lightPresets, &LightPresets::showToggle);
     //menu->addAction( tr("Show/Hide Beamer Control"), bcontrol, SLOT( showToggle() ) );
 	menu->addSeparator();
     //menu->addAction( tr("Configure DMX Channels"), configDMX, SLOT( show() ) );
     //menu->addAction( tr("Configure Beamer Connection"), this, SLOT( configureBeamer() ) );
 	menu->addSeparator();
-	menu->addAction( tr("Close"), qApp, SLOT(quit()) );
+	menu->addAction( tr("Close"), qApp, &QCoreApplication::quit);
 	
-    m_systray->setContextMenu( menu );
+    m_systray->setContextMenu(menu);
 
     m_dmxThread->connectDMX();
     m_dmxThread->start(QThread::TimeCriticalPriority);
 
 #ifdef QT_DEBUG
-    DebugWindow *debugWindow = new DebugWindow(m_dmxBuffer, this);
+    auto *debugWindow = new DebugWindow(m_dmxBuffer, this);
     debugWindow->show();
 #endif //QT_DEBUG
 
 }
 
-mediacenter::~mediacenter()
+Mediacenter::~Mediacenter()
 {
     m_dmxThread->disconnectDMX();
     m_dmxThread->quitThread();
@@ -99,19 +98,21 @@ mediacenter::~mediacenter()
     delete m_dmxThread;
 }
 
-void mediacenter::showAllControls() {
-	lbars->show();
-	lpresets->show();
+void Mediacenter::showAllControls()
+{
+	m_lightBars->show();
+	m_lightPresets->show();
     //bcontrol->show();
 }
 
-void mediacenter::hideAllControls() {
-	lbars->hide();
-	lpresets->hide();
+void Mediacenter::hideAllControls()
+{
+	m_lightBars->hide();
+	m_lightPresets->hide();
     //bcontrol->hide();
 }
 
-void mediacenter::connectDMX()
+void Mediacenter::connectDMX()
 {
     if (m_dmxThread->connectDMX() == false)
     {
@@ -125,7 +126,7 @@ void mediacenter::connectDMX()
     m_systray->setIcon( QIcon(  QPixmap(QString("://on.xpm")) ) );
 }
 
-void mediacenter::disconnectDMX()
+void Mediacenter::disconnectDMX()
 {
     m_dmxThread->disconnectDMX();
 
@@ -134,11 +135,12 @@ void mediacenter::disconnectDMX()
     m_systray->setIcon( QIcon(  QPixmap(QString("://off.xpm")) ) );
 }
 
-void mediacenter::beamerStateChange( QString state ) {
+void Mediacenter::beamerStateChange( const QString& state )
+{
     m_systray->showMessage( tr("Beamer Information"), state, QSystemTrayIcon::Information, 5000 );
 }
 
-void mediacenter::configureBeamer() {
+void Mediacenter::configureBeamer() {
     /*int current = 2;
 	bool ok;
 

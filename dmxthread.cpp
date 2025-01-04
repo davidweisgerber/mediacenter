@@ -1,13 +1,12 @@
 #include "dmxthread.h"
 
-DMXThread::DMXThread(char *dmxBuffer) : QThread()
-  , m_dmxConnected(false)
-  , m_running(true)
-  , m_ftHandle(reinterpret_cast<FT_HANDLE>(INVALID_HANDLE_VALUE))
-  , m_error()
-  , m_dmxBuffer(dmxBuffer)
+DMXThread::DMXThread(char *dmxBuffer)
+    :QThread()
+    ,m_dmxConnected(false)
+    ,m_running(true)
+    ,m_ftHandle(reinterpret_cast<FT_HANDLE>(INVALID_HANDLE_VALUE))
+    ,m_dmxBuffer(dmxBuffer)
 {
-
 }
 
 bool DMXThread::connectDMX()
@@ -98,7 +97,7 @@ void DMXThread::run()
 {
     while (m_running == true)
     {
-        QThread::msleep(20);
+        msleep(20);
 
         if(m_dmxConnected == false)
         {

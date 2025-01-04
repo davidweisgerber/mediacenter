@@ -1,7 +1,6 @@
 #ifndef BEAMERCONTROL_H
 #define BEAMERCONTROL_H
 
-#include <QMainWindow>
 #include <QSerialPort>
 #include <QElapsedTimer>
 #include "ui_beamercontrol.h"
@@ -11,13 +10,13 @@ class BeamerControl : public QMainWindow
 	Q_OBJECT
 
 public:
-	BeamerControl(QWidget *parent = 0);
-	~BeamerControl();
+	explicit BeamerControl(QWidget *parent = nullptr);
+	~BeamerControl() override;
 
-	QString getStatus() { return m_status; }
-	QString getTemperature() { return m_temperature; }
-	QString getLampTime() { return m_lamptime; }
-	QString getInput() { return m_input; }
+	QString getStatus();
+	QString getTemperature();
+	QString getLampTime();
+	QString getInput();
 
 public slots:
 	void powerOn();
@@ -33,21 +32,26 @@ private slots:
 	void processSerial();
 
 private:
-	void processStatus( QString buf );
-	void processInput( QString buf );
-	void processLampTime( QString buf );
-	void processTemperature( QString buf );
-	void processCommandFeedback( QString buf );
+	void processStatus(const QString& buf);
+	void processInput(const QString& buf);
+	void processLampTime(QString buf);
+	void processTemperature(const QString& buf);
+	void processCommandFeedback(const QString& buf);
 	void proceedCommandPipe();
+
 	Ui::BeamerControlClass ui;
-    QSerialPort *m_serial;
-	int m_lastCommand;
-	int m_lastStatus;
+    QSerialPort *m_serial = nullptr;
+	int m_lastCommand = 0;
+	int m_lastStatus = 0;
 	QElapsedTimer m_lastAction;
-	QString m_status, m_input, m_temperature, m_lamptime, m_command;
+	QString m_status;
+	QString m_input;
+	QString m_temperature;
+	QString m_lamptime;
+	QString m_command;
 
 signals:
-	void stateChanged( QString state );
+	void stateChanged(QString state);
 	void updateStatus();
 	void badThing();
 };

@@ -3,8 +3,9 @@
 
 #include <QDialog>
 
-namespace Ui {
-class DebugWindow;
+namespace Ui
+{
+    class DebugWindow;
 }
 
 class DebugWindow : public QDialog
@@ -12,8 +13,8 @@ class DebugWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit DebugWindow(char *dmxBuffer, QWidget *parent = 0);
-    ~DebugWindow();
+    explicit DebugWindow(char *dmxBuffer, QWidget *parent = nullptr);
+    ~DebugWindow() override;
 
 private slots:
     void refresh();

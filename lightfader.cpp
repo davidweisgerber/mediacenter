@@ -3,9 +3,8 @@
 #include "eurolitepmd8configuration.h"
 #include "lightfader.h"
 
-LightFader::LightFader(int startChannel, QString name, OperatingMode mode, char *dmxData,  QWidget *parent)
+LightFader::LightFader(int startChannel, const QString& name, OperatingMode mode, char *dmxData,  QWidget *parent)
 	: QWidget(parent)
-    , m_values()
     , m_startChannel(startChannel)
     , m_operatingMode(mode)
     , m_dmxData(dmxData)
@@ -29,16 +28,14 @@ LightFader::LightFader(int startChannel, QString name, OperatingMode mode, char 
 }
 
 LightFader::~LightFader()
-{
-
-}
+= default;
 
 const QVector<int> &LightFader::getValues()
 {
     return m_values;
 }
 
-int LightFader::getStartChannel()
+int LightFader::getStartChannel() const
 {
     return m_startChannel;
 }
@@ -50,7 +47,8 @@ void LightFader::setValue(int value, int channel)
         ui.slider->setValue(static_cast<int>(static_cast<double>(value) / 2.55));
         return;
     }
-    else if (channel == 1 && m_operatingMode == EUROLITE_PMD_8)
+
+    if (channel == 1 && m_operatingMode == EUROLITE_PMD_8)
     {
         ui.slider->setValue(static_cast<int>(static_cast<double>(value) / 2.55));
         return;
@@ -107,7 +105,7 @@ void LightFader::configureClicked()
     {
         case SINGLE_CHANNEL:
         {
-            QInputDialog *dlg = new QInputDialog(this);
+            auto *dlg = new QInputDialog(this);
             dlg->setInputMode(QInputDialog::IntInput);
             dlg->setIntMaximum(255);
             dlg->setIntMinimum(0);
@@ -117,11 +115,14 @@ void LightFader::configureClicked()
             dlg->setLabelText(tr("DMX Value:"));
             connect(dlg, &QInputDialog::intValueChanged, this, &LightFader::setValueFromDialog);
             dlg->exec();
+
+            delete dlg;
             break;
         }
         case EUROLITE_PMD_8:
-            EuroLitePMD8Configuration *dlg = new EuroLitePMD8Configuration(this);
+            auto *dlg = new EuroLitePMD8Configuration(this);
             dlg->exec();
+            delete dlg;
             break;
     }
 }

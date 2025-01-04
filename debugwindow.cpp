@@ -1,5 +1,4 @@
 #include <QTimer>
-#include <QTreeWidgetItem>
 #include "debugwindow.h"
 #include "ui_debugwindow.h"
 
@@ -12,13 +11,13 @@ DebugWindow::DebugWindow(char *dmxBuffer, QWidget *parent) :
 
     for (int i=0; i < 512; i++)
     {
-        QTreeWidgetItem *item = new QTreeWidgetItem(QStringList() << QString::number(i) << "");
+        auto *item = new QTreeWidgetItem(QStringList() << QString::number(i) << "");
         ui->treeWidget->addTopLevelItem(item);
     }
 
     ui->treeWidget->resizeColumnToContents(0);
 
-    QTimer *timer = new QTimer(this);
+    auto *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &DebugWindow::refresh);
     timer->setInterval(50);
     timer->start();

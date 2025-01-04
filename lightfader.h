@@ -15,15 +15,15 @@ public:
         EUROLITE_PMD_8
     };
 
-    LightFader(int startChannel, QString name, OperatingMode mode, char *dmxData, QWidget *parent = 0);
-	~LightFader();
+    LightFader(int startChannel, const QString& name, OperatingMode mode, char *dmxData, QWidget *parent = nullptr);
+	~LightFader() override;
 
     const QVector<int> &getValues();
-    int getStartChannel();
+    int getStartChannel() const;
 
     void setValue(int value, int channel);
     void setMasterValue(int value);
-    OperatingMode getMode() const;
+    [[nodiscard]] OperatingMode getMode() const;
 
     QString getName();
 
@@ -43,7 +43,7 @@ private:
     OperatingMode m_operatingMode;
     char *m_dmxData;
     int m_masterValue;
-	Ui::LightFaderClass ui;
+	Ui::LightFaderClass ui{};
 };
 
 #endif // LIGHTFADER_H
