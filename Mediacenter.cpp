@@ -33,12 +33,17 @@ Mediacenter::Mediacenter(QWidget *parent)
 
     m_lightBars = new LightBars(m_dmxBuffer, this);
     m_lightBars->buildUp(m_settingsObject);
-	m_lightBars->show();
+	if (m_settingsObject["showLightBars"].toBool(true) == true)
+	{
+		m_lightBars->show();
+	}
 
 	m_lightPresets = new LightPresets( m_lightBars, this );
     m_lightPresets->buildUp(m_settingsObject);
-	m_lightPresets->show();
-
+	if (m_settingsObject["showLightPresets"].toBool(true) == true)
+	{
+		m_lightPresets->show();
+	}
     /*bcontrol = new BeamerControl( this );
 	connect( bcontrol, SIGNAL( stateChanged( QString ) ), this, SLOT( beamerStateChange( QString ) ) );
 	connect( bcontrol, SIGNAL( updateStatus() ), this, SLOT( setSystrayToolTip() ) );
@@ -51,8 +56,9 @@ Mediacenter::Mediacenter(QWidget *parent)
 	//connect( m_configureDMX, &ConfigureDMX::configured, m_lightBars, SLOT( buildUp() ) );
 
 	QRect geo = qApp->primaryScreen()->availableGeometry();
-	m_lightBars->move( geo.width() - m_lightBars->geometry().size().width() - 6, geo.y() );
-	m_lightPresets->move( m_lightBars->geometry().x() - m_lightPresets->geometry().width() - 9, geo.y() );
+	m_lightPresets->move(geo.width() - m_lightPresets->geometry().width() - 9, geo.y() + 64);
+	m_lightBars->move( geo.width() - m_lightBars->geometry().size().width() - 6, geo.y() + m_lightPresets->geometry().height() + m_lightPresets->geometry().y() + 32 );
+
     /*bcontrol->move( lbars->geometry().x() - bcontrol->geometry().width() - 9,
         lpresets->geometry().y() + lpresets->geometry().height() + 3);*/
 
