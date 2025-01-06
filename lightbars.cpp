@@ -140,7 +140,7 @@ void LightBars::setStatus(const QMap<int, int>& status)
 
 bool LightBars::isFaderMaster(int channel)
 {
-    for( int i=0; i < m_layout->count(); i++ )
+    for(int i=0; i < m_layout->count(); i++)
     {
         auto *cur = qobject_cast<LightFader*>(m_layout->itemAt(i)->widget());
 

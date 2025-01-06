@@ -204,17 +204,17 @@ void LightPresets::presetStep()
 {
 	QMap<int, int> status;
 	const QList<int> channels = m_fadeEnd.keys();
-	for (int i=0; i < channels.size(); ++i)
+	for (int channel : channels)
 	{
-        if (m_bars->isFaderMaster(i))
+        if (m_bars->isFaderMaster(channel))
         {
-            status[channels.at(i)] = static_cast<int>(m_fadeStart[channels.at(i)] +
-                static_cast<double>(m_fadeEnd[channels.at(i)] - m_fadeStart[channels.at(i)]) *
+            status[channel] = static_cast<int>(m_fadeStart[channel] +
+                static_cast<double>(m_fadeEnd[channel] - m_fadeStart[channel]) *
                 (static_cast<double>(m_fadeCounter.elapsed()) / (m_timerValue * 1000.0)));
         }
         else
         {
-            status[channels.at(i)] = m_fadeEnd[channels.at(i)];
+            status[channel] = m_fadeEnd[channel];
         }
 	}
 
