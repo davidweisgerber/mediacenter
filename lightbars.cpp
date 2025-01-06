@@ -5,9 +5,9 @@
 #include <QtDebug>
 
 LightBars::LightBars(char *dmxBuffer, QWidget *parent)
-    : QMainWindow(parent, Qt::WindowStaysOnTopHint | Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint )
-    , m_dmxBuffer(dmxBuffer)
-    , m_master(100)
+    :QMainWindow(parent, Qt::WindowStaysOnTopHint | Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint )
+    ,m_dmxBuffer(dmxBuffer)
+    ,m_master(100)
 {
 	setWindowTitle( tr("Light Faders") );
 	setGeometry( QRect( 100, 100, 1024, 1024 ) );
@@ -115,7 +115,7 @@ QMap<int, int> LightBars::getStatus()
         int startChannel = cur->getStartChannel();
         QVector<int> values = cur->getValues();
 
-        for (int j=0; i < values.size(); i++)
+        for (int j=0; j < values.size(); j++)
         {
             retVal.insert(startChannel + j, values[j]);
         }
@@ -131,7 +131,7 @@ void LightBars::setStatus(const QMap<int, int>& status)
         auto *cur = qobject_cast<LightFader*>(m_layout->itemAt(i)->widget());
         qsizetype numberOfChannels = cur->getValues().size();
 
-        for (int j=0; i < numberOfChannels; i++)
+        for (int j=0; j < numberOfChannels; j++)
         {
             cur->setValue(status.value(cur->getStartChannel() + j, 0), j);
         }
