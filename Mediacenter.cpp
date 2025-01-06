@@ -91,6 +91,11 @@ Mediacenter::Mediacenter(QWidget *parent)
 
 Mediacenter::~Mediacenter()
 {
+	if (m_settingsObject["nulldmx"].toBool(false) == true)
+	{
+		m_dmxThread->nulldmx();
+	}
+
     m_dmxThread->disconnectDMX();
     m_dmxThread->quitThread();
     m_dmxThread->wait();

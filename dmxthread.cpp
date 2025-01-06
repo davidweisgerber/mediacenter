@@ -76,7 +76,7 @@ void DMXThread::disconnectDMX()
     }
 
     m_dmxConnected = false;
-    QThread::msleep(50);
+    msleep(50);
 
 #ifdef Q_OS_WIN
     FT_W32_CloseHandle(m_ftHandle);
@@ -91,6 +91,17 @@ const QString &DMXThread::getError()
 void DMXThread::quitThread()
 {
     m_running = false;
+}
+
+void DMXThread::nulldmx()
+{
+    if (m_running == false)
+    {
+        return;
+    }
+
+    ::memset(m_dmxBuffer, 0, 512);
+    msleep(100);
 }
 
 void DMXThread::run()

@@ -13,6 +13,7 @@ public:
     void disconnectDMX();
     const QString &getError();
     void quitThread();
+    void nulldmx();
 
 protected:
     void run() override;
