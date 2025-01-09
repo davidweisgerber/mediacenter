@@ -56,8 +56,8 @@ Mediacenter::Mediacenter(QWidget *parent)
 	//connect( m_configureDMX, &ConfigureDMX::configured, m_lightBars, SLOT( buildUp() ) );
 
 	QRect geo = qApp->primaryScreen()->availableGeometry();
-	m_lightPresets->move(geo.width() - m_lightPresets->geometry().width() - 9, geo.y() + 64);
-	m_lightBars->move( geo.width() - m_lightBars->geometry().size().width() - 6, geo.y() + m_lightPresets->geometry().height() + m_lightPresets->geometry().y() + 32 );
+	m_lightPresets->move(geo.width() - m_lightPresets->geometry().width(), geo.y() + 32);
+	m_lightBars->move( geo.width() - m_lightBars->geometry().size().width(), m_lightPresets->geometry().height() + m_lightPresets->geometry().y());
 
     /*bcontrol->move( lbars->geometry().x() - bcontrol->geometry().width() - 9,
         lpresets->geometry().y() + lpresets->geometry().height() + 3);*/

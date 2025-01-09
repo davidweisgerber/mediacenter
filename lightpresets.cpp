@@ -70,14 +70,6 @@ LightPresets::LightPresets(LightBars *bars, QWidget *parent)
 	});
 
     m_settingsFile = QDir::homePath() + QDir::separator() + "mediacenter.settings.json";
-
-	m_tcpServer = new QTcpServer(this);
-	if (m_tcpServer->listen(QHostAddress::Any, 8089) == false || m_httpServer.bind(m_tcpServer) == false)
-	{
-		delete m_tcpServer;
-
-		qCritical() << "Could not bind to port 8089";
-	}
 }
 
 LightPresets::~LightPresets()
@@ -304,6 +296,14 @@ void LightPresets::buildUp(const QJsonObject &source)
 
     const QJsonDocument document = QJsonDocument::fromJson(settings);
     addPresets(document.array(), false);
+
+	m_tcpServer = new QTcpServer(this);
+	if (m_tcpServer->listen(QHostAddress::Any, source["apiPort"].toInt(8089)) == false || m_httpServer.bind(m_tcpServer) == false)
+	{
+		delete m_tcpServer;
+
+		qCritical() << "Could not bind to port 8089";
+	}
 }
 
 void LightPresets::addPresets(const QJsonArray &faderArray, bool isSystem)
