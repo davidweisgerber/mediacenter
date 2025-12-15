@@ -8,10 +8,12 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QDir>
-
+#include <QNetworkReply>
+#include <QRandomGenerator>
 
 LightPresets::LightPresets(LightBars *bars, QWidget *parent)
-    : QMainWindow(parent, Qt::WindowStaysOnTopHint | Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint )
+    :QMainWindow(parent, Qt::WindowStaysOnTopHint | Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint )
+	,m_networkAccessManager(new QNetworkAccessManager(this))
 {
 	ui.setupUi(this);
 	m_bars = bars;
@@ -22,7 +24,7 @@ LightPresets::LightPresets(LightBars *bars, QWidget *parent)
 	m_scrollArea->setWidgetResizable( false );
 	m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
 
-	auto *base = new QWidget( this );
+	auto *base = new QWidget( this ); //NOLINT (cppcoreguidelines-owning-memory) Memory is managed by Qt
 	m_layout = new QHBoxLayout();
 	m_layout->setSizeConstraint( QLayout::SetFixedSize );
 	m_layout->setSpacing( 2 );
@@ -301,9 +303,12 @@ void LightPresets::buildUp(const QJsonObject &source)
 	if (m_tcpServer->listen(QHostAddress::Any, source["apiPort"].toInt(8089)) == false || m_httpServer.bind(m_tcpServer) == false)
 	{
 		delete m_tcpServer;
+		m_tcpServer = nullptr;
 
 		qCritical() << "Could not bind to port 8089";
 	}
+
+	buildButtons(source);
 }
 
 void LightPresets::addPresets(const QJsonArray &faderArray, bool isSystem)
@@ -331,4 +336,225 @@ void LightPresets::addPresets(const QJsonArray &faderArray, bool isSystem)
 
         p->setValues(values);
     }
+}
+
+void LightPresets::setupButtonCommunicationShelly(const QJsonObject& settings, QPushButton* onButton, QPushButton* offButton)
+{
+	auto testTimer = new QTimer(this); //NOLINT (cppcoreguidelines-owning-memory) Memory is managed by Qt
+	testTimer->setInterval(1000);
+	onButton->setEnabled(false);
+	offButton->setEnabled(false);
+
+	auto parseAnswer = [onButton, offButton](const QByteArray &responseData)
+	{
+		const QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+		const QJsonObject jsonObj = jsonDoc.object();
+
+		if (jsonObj.contains("result") == false)
+		{
+			qCritical() << "No result from request" << responseData;
+			onButton->setEnabled(false);
+			offButton->setEnabled(false);
+			return;
+		}
+
+		const bool isOn = jsonObj["result"].toObject()["output"].toBool();
+
+		onButton->setEnabled(isOn == false);
+		offButton->setEnabled(isOn == true);
+	};
+
+	connect(testTimer, &QTimer::timeout, this, [parseAnswer, settings, this]()
+	{
+		QJsonObject requestObject;
+		requestObject["id"] = settings["switch"].toInt();
+		requestObject["method"] = "Switch.GetStatus";
+		QJsonObject paramsObject;
+		paramsObject["id"] = settings["switch"].toInt();
+		requestObject["params"] = paramsObject;
+
+		QNetworkRequest request(QString("http://%1/rpc").arg(settings["address"].toString()));
+		request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+		sendShellyRequest(request, requestObject, parseAnswer, settings["password"].toString());
+	});
+
+	connect(onButton, &QPushButton::clicked, this, [settings, this]()
+	{
+		QJsonObject requestObject;
+		requestObject["id"] = settings["switch"].toInt();
+		requestObject["method"] = "Switch.Set";
+		QJsonObject paramsObject;
+		paramsObject["id"] = settings["switch"].toInt();
+		paramsObject["on"] = true;
+		requestObject["params"] = paramsObject;
+
+		QNetworkRequest request(QString("http://%1/rpc").arg(settings["address"].toString()));
+		request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+		sendShellyRequest(request, requestObject, [](const QByteArray &){}, settings["password"].toString());
+	});
+
+	connect(offButton, &QPushButton::clicked, this, [settings, this]()
+	{
+		QJsonObject requestObject;
+		requestObject["id"] = settings["switch"].toInt();
+		requestObject["method"] = "Switch.Set";
+		QJsonObject paramsObject;
+		paramsObject["id"] = settings["switch"].toInt();
+		paramsObject["on"] = false;
+		requestObject["params"] = paramsObject;
+
+		QNetworkRequest request(QString("http://%1/rpc").arg(settings["address"].toString()));
+		request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+		sendShellyRequest(request, requestObject, [](const QByteArray &){}, settings["password"].toString());
+	});
+
+	testTimer->start();
+}
+void LightPresets::sendShellyRequest(const QNetworkRequest& request, const QJsonObject& requestObject, const std::function<void(const QByteArray&)>& parseAnswer, const QString &password)
+{
+	QNetworkReply* reply = m_networkAccessManager->post(request, QJsonDocument(requestObject).toJson());
+	connect(reply, &QNetworkReply::finished, this, [reply, requestObject, parseAnswer, password, this, request]()
+	{
+		if (reply->error() == QNetworkReply::AuthenticationRequiredError)
+		{
+			const QString authenticate = reply->rawHeader("WWW-Authenticate");
+			QString realm;
+			QString nonce;
+			const QStringList parts = authenticate.split(",");
+			if (const auto hasRealm = std::find_if(parts.cbegin(), parts.cend(), [&](const QString& s){return s.trimmed().startsWith("realm");}); hasRealm != parts.cend())
+			{
+				realm = hasRealm->split("=").last().remove("\"");
+			}
+			if (const auto hasNonce = std::find_if(parts.cbegin(), parts.cend(), [&](const QString& s){return s.trimmed().startsWith("nonce");}); hasNonce != parts.cend())
+			{
+				nonce = hasNonce->split("=").last().remove("\"");
+			}
+
+			if (realm.isEmpty() == false && nonce.isEmpty() == false)
+			{
+				constexpr int nc = 1;
+
+				QJsonObject authenticationObject;
+				authenticationObject["realm"] = realm;
+				authenticationObject["nonce"] = nonce;
+				authenticationObject["username"] = "admin";
+				authenticationObject["cnonce"] = QString::number(QRandomGenerator::global()->generate64());
+				authenticationObject["algorithm"] ="SHA-256";
+
+				QCryptographicHash ha1(QCryptographicHash::Sha256);
+				ha1.addData(QString("%1:%2:%3").arg("admin", realm, password).toLatin1());
+				const QString ha1Result = QString::fromLatin1(ha1.result().toHex());
+
+				QCryptographicHash ha2(QCryptographicHash::Sha256);
+				ha2.addData("dummy_method:dummy_uri");
+				const QString ha2Result = QString::fromLatin1(ha2.result().toHex());
+
+				QCryptographicHash hash(QCryptographicHash::Sha256);
+				const QString hashString = ha1Result +
+					":" + nonce +
+					":" + QString::number(nc) +
+					":" + authenticationObject["cnonce"].toString() +
+					":auth" +
+					":" + ha2Result;
+
+				hash.addData(hashString.toLatin1());
+				authenticationObject["response"] = QString::fromLatin1(hash.result().toHex());
+
+				QJsonObject requestObjectWithAuth = requestObject;
+				requestObjectWithAuth["auth"] = authenticationObject;
+
+				QNetworkReply* newReply = m_networkAccessManager->post(request, QJsonDocument(requestObjectWithAuth).toJson());
+				connect(newReply, &QNetworkReply::finished, this, [newReply, parseAnswer]()
+				{
+					if (newReply->error() != QNetworkReply::NoError)
+					{
+						qDebug() << "Error after auth" << newReply->errorString();
+						newReply->deleteLater();
+						return;
+					}
+
+					parseAnswer(newReply->readAll());
+					newReply->deleteLater();
+				});
+			}
+
+			reply->deleteLater();
+			return;
+		}
+
+		if (reply->error() != QNetworkReply::NoError)
+		{
+			qDebug() << reply->errorString();
+			reply->deleteLater();
+			return;
+		}
+
+		parseAnswer(reply->readAll());
+		reply->deleteLater();
+	});
+}
+
+void LightPresets::buildButtons(const QJsonObject& source)
+{
+	auto buttonArray = source["buttons"].toArray();
+	const int startXOffset = width();
+	constexpr int BUTTON_WIDTH = 100;
+	constexpr int BUTTONS_PER_COLUMN = 2;
+
+	const int numberOfColumns = std::ceil(buttonArray.size() / BUTTONS_PER_COLUMN);
+	const int newWidth = width() + (numberOfColumns * BUTTON_WIDTH);
+	resize(newWidth, height());
+	setMinimumWidth(newWidth);
+	setMaximumWidth(newWidth);
+
+	for (int i=0; i < numberOfColumns; i++)
+	{
+		QWidget *base = new QWidget(this); //NOLINT (cppcoreguidelines-owning-memory) Memory is managed by Qt
+		base->setGeometry(QRect(startXOffset + (i * BUTTON_WIDTH), 0, BUTTON_WIDTH, height()));
+
+		QVBoxLayout *layout = new QVBoxLayout(); //NOLINT (cppcoreguidelines-owning-memory) Memory is managed by Qt
+		base->setLayout(layout);
+		layout->setSizeConstraint(QLayout::SetFixedSize);
+		layout->setSpacing(0);
+		layout->setContentsMargins( 0, 0, 0, 0);
+
+		for (int j=0; j < BUTTONS_PER_COLUMN; j++)
+		{
+			int buttonIndex = (i * BUTTONS_PER_COLUMN) + j;
+			if (buttonIndex >= buttonArray.size())
+			{
+				break;
+			}
+
+			auto buttonObject = buttonArray[buttonIndex].toObject();
+			auto *label = new QLabel(buttonObject["name"].toString(), this); //NOLINT (cppcoreguidelines-owning-memory) Memory is managed by Qt
+			label->setMaximumHeight(16);
+			layout->addWidget(label);
+
+			QWidget *buttonBase = new QWidget(this); //NOLINT (cppcoreguidelines-owning-memory) Memory is managed by Qt
+			layout->addWidget(buttonBase);
+			QHBoxLayout *buttonLayout = new QHBoxLayout(); //NOLINT (cppcoreguidelines-owning-memory) Memory is managed by Qt
+			buttonBase->setLayout(buttonLayout);
+			buttonLayout->setSpacing(0);
+			buttonLayout->setContentsMargins( 0, 0, 0, 0);
+
+			auto *buttonOff = new QPushButton(tr("Off"), buttonBase); //NOLINT (cppcoreguidelines-owning-memory) Memory is managed by Qt
+			buttonOff->setMaximumWidth(40);
+			buttonOff->setMinimumWidth(40);
+			buttonOff->setMaximumHeight(16);
+			buttonLayout->addWidget(buttonOff);
+			buttonLayout->addSpacerItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
+
+			auto *buttonOn = new QPushButton(tr("On"), buttonBase); //NOLINT (cppcoreguidelines-owning-memory) Memory is managed by Qt
+			buttonOn->setMaximumWidth(40);
+			buttonOn->setMinimumWidth(40);
+			buttonOn->setMaximumHeight(16);
+			buttonLayout->addWidget(buttonOn);
+
+			setupButtonCommunicationShelly(buttonObject, buttonOn, buttonOff);
+		}
+	}
 }

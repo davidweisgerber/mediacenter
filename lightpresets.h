@@ -8,7 +8,9 @@
 #include "lightbars.h"
 #include <QElapsedTimer>
 #include <QHttpServer>
+#include <qjsonvalue.h>
 #include <QTcpServer>
+#include <QNetworkAccessManager>
 
 class Preset;
 class QTimer;
@@ -41,6 +43,10 @@ private slots:
     void addPresets(const QJsonArray &array, bool isSystem);
 
 private:
+	void setupButtonCommunicationShelly(const QJsonObject& settings, QPushButton* onButton, QPushButton* offButton);
+	void sendShellyRequest(const QNetworkRequest& request, const QJsonObject &requestObject, const std::function<void(const QByteArray&)>& parseAnswer, const QString &password);
+	void buildButtons(const QJsonObject &source);
+
 	Ui::LightPresetsClass ui{};
 	double m_timerValue = 0.0;
 	QHBoxLayout *m_layout = nullptr;
@@ -54,6 +60,7 @@ private:
 
 	QTcpServer *m_tcpServer = nullptr;
 	QHttpServer m_httpServer;
+	QNetworkAccessManager *m_networkAccessManager = nullptr;
 };
 
 #endif // LIGHTPRESETS_H

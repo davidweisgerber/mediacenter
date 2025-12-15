@@ -227,5 +227,22 @@
         "title": "Musik"
     }
 	],
+	"buttons":
+	[
+		{
+			"name": "Empore",
+			"type": 0,
+			"address": "192.168.178.109",
+			"password": "jaja",
+			"switch": 0
+		},
+		{
+			"name": "Bühne",
+			"type": 0,
+			"address": "192.168.178.109",
+			"password": "jaja",
+			"switch": 1
+		}
+	],
 	"autofader":1.5
 }
