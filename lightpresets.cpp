@@ -12,7 +12,7 @@
 #include <QRandomGenerator>
 
 LightPresets::LightPresets(LightBars *bars, QWidget *parent)
-    :QMainWindow(parent, Qt::WindowStaysOnTopHint | Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint )
+    :QMainWindow(parent, Qt::WindowStaysOnTopHint | Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint)
 	,m_networkAccessManager(new QNetworkAccessManager(this))
 {
 	ui.setupUi(this);

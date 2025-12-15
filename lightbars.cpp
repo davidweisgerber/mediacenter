@@ -5,7 +5,7 @@
 #include <QtDebug>
 
 LightBars::LightBars(char *dmxBuffer, QWidget *parent)
-    :QMainWindow(parent, Qt::WindowStaysOnTopHint | Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint )
+    :QMainWindow(parent, Qt::WindowStaysOnTopHint | Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint )
     ,m_dmxBuffer(dmxBuffer)
     ,m_master(100)
 {

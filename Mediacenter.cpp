@@ -84,6 +84,10 @@ Mediacenter::Mediacenter(QWidget *parent)
 	menu->addAction( tr("Close"), qApp, &QCoreApplication::quit);
 	
     m_systray->setContextMenu(menu);
+	connect(m_systray, &QSystemTrayIcon::activated, this, [this](QSystemTrayIcon::ActivationReason reason)
+	{
+		m_systray->contextMenu()->popup(QCursor::pos());
+	});
 
     m_dmxThread->connectDMX();
     m_dmxThread->start(QThread::TimeCriticalPriority);
