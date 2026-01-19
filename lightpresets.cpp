@@ -1,5 +1,6 @@
 #include "lightpresets.h"
 #include "preset.h"
+#include "livestream.h"
 #include <cmath>
 #include <QSettings>
 #include <QTimer>
@@ -115,7 +116,7 @@ void LightPresets::setBlack() const
 	QMap<int, int> retVal;
 	QList<int> channels = map.keys();
 
-	for (int channel : channels)
+	for (int channel : std::as_const(channels))
 	{
 		 retVal.insert( channel, 0 );
 	}
@@ -128,7 +129,7 @@ void LightPresets::setFull() const
 	QMap<int, int> retVal;
 	QList<int> channels = map.keys();
 
-	for (int channel : channels)
+	for (int channel : std::as_const(channels))
 	{
 		 retVal.insert( channel, 255 );
 	}
@@ -252,7 +253,7 @@ void LightPresets::savePresets()
 		
 		QMap<int, int> values = cur->getValues();
 		QList<int> channels = values.keys();
-        for (int channel : channels)
+		for (int channel : std::as_const(channels))
         {
             object[QString::number(channel)] = values.value(channel, 0);
 		}
@@ -502,7 +503,7 @@ void LightPresets::buildButtons(const QJsonObject& source)
 	auto buttonArray = source["buttons"].toArray();
 	const int startXOffset = width();
 	constexpr int BUTTON_WIDTH = 100;
-	constexpr int BUTTONS_PER_COLUMN = 2;
+	constexpr int BUTTONS_PER_COLUMN = 3;
 
 	const int numberOfColumns = std::ceil(buttonArray.size() / BUTTONS_PER_COLUMN);
 	const int newWidth = width() + (numberOfColumns * BUTTON_WIDTH);
@@ -554,7 +555,16 @@ void LightPresets::buildButtons(const QJsonObject& source)
 			buttonOn->setMaximumHeight(16);
 			buttonLayout->addWidget(buttonOn);
 
-			setupButtonCommunicationShelly(buttonObject, buttonOn, buttonOff);
+			if (buttonObject["type"].toInt() == 0)
+			{
+				setupButtonCommunicationShelly(buttonObject, buttonOn, buttonOff);
+			}
+			else if (buttonObject["type"].toInt() == 1)
+			{
+				auto *livestream = new Livestream(buttonObject, this); //NOLINT (cppcoreguidelines-owning-memory) Memory is managed by Qt
+				connect(buttonOn, &QPushButton::clicked, livestream, &Livestream::startStream);
+				connect(buttonOff, &QPushButton::clicked, livestream, &Livestream::stopStream);
+			}
 		}
 	}
 }

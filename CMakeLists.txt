@@ -15,7 +15,7 @@ endif()
 set(INSTALL_EXAMPLEDIR "${INSTALL_EXAMPLESDIR}")
 
 find_package(QT NAMES Qt5 Qt6 REQUIRED COMPONENTS Core)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui SerialPort Widgets HttpServer)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui SerialPort Widgets HttpServer NetworkAuth)
 
 qt_add_executable(mediacenter WIN32 MACOSX_BUNDLE
     beamercontrol.cpp beamercontrol.h beamercontrol.ui
@@ -29,6 +29,7 @@ qt_add_executable(mediacenter WIN32 MACOSX_BUNDLE
     main.cpp
         Mediacenter.cpp Mediacenter.h mediacenter.ui
     preset.cpp preset.h preset.ui
+        livestream.h livestream.cpp
 )
 target_link_libraries(mediacenter PUBLIC
     Qt::Core
@@ -36,6 +37,7 @@ target_link_libraries(mediacenter PUBLIC
     Qt::SerialPort
     Qt::Widgets
     Qt::HttpServer
+    Qt6::NetworkAuth
 )
 
 

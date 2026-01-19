@@ -242,6 +242,11 @@
 			"address": "192.168.178.109",
 			"password": "jaja",
 			"switch": 1
+		},
+		{
+			"name": "Livestream",
+			"type": 1,
+			"atemAddress": "localhost"
 		}
 	],
 	"autofader":1.5
