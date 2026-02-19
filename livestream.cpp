@@ -81,7 +81,7 @@ void Livestream::stopStream()
 		tcpSocket->flush();
 		tcpSocket->deleteLater();
 	});
-	connect(tcpSocket, &QTcpSocket::errorOccurred, this, [tcpSocket, this](QAbstractSocket::SocketError socketError)
+	connect(tcpSocket, &QTcpSocket::errorOccurred, this, [tcpSocket](QAbstractSocket::SocketError socketError)
 	{
 		liveStreamError("Error connecting to ATEM Mini Pro: " + tcpSocket->errorString());
 		tcpSocket->deleteLater();
@@ -188,7 +188,7 @@ void Livestream::youtubeGetStreamFinished(const QByteArray& data)
 		tcpSocket->flush();
 		tcpSocket->deleteLater();
 	});
-	connect(tcpSocket, &QTcpSocket::errorOccurred, this, [tcpSocket, this](QAbstractSocket::SocketError socketError)
+	connect(tcpSocket, &QTcpSocket::errorOccurred, this, [tcpSocket](QAbstractSocket::SocketError socketError)
 	{
 		liveStreamError("Error connecting to ATEM Mini Pro: " + tcpSocket->errorString());
 		tcpSocket->deleteLater();

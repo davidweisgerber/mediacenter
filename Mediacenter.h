@@ -26,6 +26,9 @@ private slots:
     void disconnectDMX();
 	void beamerStateChange( const QString& state );
 	void configureBeamer();
+	void onCommitData(QSessionManager &sm);
+	void onSaveState(QSessionManager &sm);
+	void showTurnOffButtonsMessage(const QStringList &checkedButtons) const;
 
 private:
 	Ui::mediacenterClass ui{};

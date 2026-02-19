@@ -312,6 +312,11 @@ void LightPresets::buildUp(const QJsonObject &source)
 	buildButtons(source);
 }
 
+const QList<LightPresets::ButtonRow>& LightPresets::getButtonRows() const
+{
+	return m_buttonRows;
+}
+
 void LightPresets::addPresets(const QJsonArray &faderArray, bool isSystem)
 {
     const qsizetype numberOfPresets = faderArray.size();
@@ -565,6 +570,8 @@ void LightPresets::buildButtons(const QJsonObject& source)
 				connect(buttonOn, &QPushButton::clicked, livestream, &Livestream::startStream);
 				connect(buttonOff, &QPushButton::clicked, livestream, &Livestream::stopStream);
 			}
+
+			m_buttonRows.append({.name = label->text(), .onButton = buttonOn, .offButton = buttonOff});
 		}
 	}
 }

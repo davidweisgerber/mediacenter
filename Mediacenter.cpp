@@ -9,6 +9,7 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QtDebug>
+#include <QSessionManager>
 #include "debugwindow.h"
 #include "configuredmx.h"
 #include "dmxthread.h"
@@ -16,6 +17,9 @@
 Mediacenter::Mediacenter(QWidget *parent)
     :QMainWindow(parent)
 {
+	connect(qApp, &QGuiApplication::commitDataRequest, this, &Mediacenter::onCommitData);
+	connect(qApp, &QGuiApplication::saveStateRequest, this, &Mediacenter::onSaveState);
+
     memset(m_dmxBuffer, 0, 512);
     m_dmxThread = new DMXThread(m_dmxBuffer);
 
@@ -181,4 +185,75 @@ void Mediacenter::configureBeamer() {
 		settings.setValue( "beamerport", comPort );
 		bcontrol->initialize();
     }*/
+}
+
+void Mediacenter::onCommitData(QSessionManager& sm)
+{
+	QStringList checkedButtons;
+	for (const auto& row: m_lightPresets->getButtonRows())
+	{
+		if (row.offButton->isEnabled() == true && row.onButton->isEnabled() == false)
+		{
+			checkedButtons.append(row.name);
+		}
+	}
+
+	if (checkedButtons.isEmpty() == true)
+	{
+		sm.release();
+		return;
+	}
+
+	if (sm.allowsInteraction() == false)
+	{
+#ifdef Q_OS_WIN
+		HWND hwnd = reinterpret_cast<HWND>(w->winId());
+		ShutdownBlockReasonCreateW(hwnd, L"Power is still on");
+		QTimer::singleShot(0, this, [this, checkedButtons]()
+		{
+			showTurnOffButtonsMessage(checkedButtons)
+		});
+
+		sm.cancel();
+		return;
+#endif
+	}
+	else
+	{
+#ifdef Q_OS_WIN
+		HWND hwnd = reinterpret_cast<HWND>(w->winId());
+		ShutdownBlockReasonCreateW(hwnd, L"Power is still on");
+		showTurnOffButtonsMessage(checkedButtons);
+		sm.cancel();
+		return;
+#endif
+	}
+}
+
+void Mediacenter::onSaveState(QSessionManager& sm)
+{
+	qDebug() << "onSaveState called";
+}
+
+void Mediacenter::showTurnOffButtonsMessage(const QStringList &checkedButtons) const
+{
+	if (const auto button = QMessageBox::critical(nullptr, tr("Turn off buttons"), tr("The following buttons are still on:\n%1\nDo you want them to be turned off?").arg(checkedButtons.join("\n")), QMessageBox::Yes | QMessageBox::No); button == QMessageBox::Yes)
+	{
+		for (const auto& [name, onButton, offButton]: m_lightPresets->getButtonRows())
+		{
+			if (checkedButtons.contains(name) == true)
+			{
+				emit offButton->clicked();
+			}
+		}
+
+		QTimer::singleShot(1000, this, []()
+		{
+#ifdef Q_OS_WIN
+			HWND hwnd = reinterpret_cast<HWND>(w->winId());
+			ShutdownBlockReasonDestroy(hwnd);
+			qApp->quit();
+#endif
+		});
+	}
 }

@@ -21,6 +21,14 @@ class LightPresets : public QMainWindow
 	Q_OBJECT
 
 public:
+	struct ButtonRow
+	{
+		QString name;
+		QPushButton* onButton;
+		QPushButton* offButton;
+	};
+
+
 	explicit LightPresets(LightBars *bars, QWidget *parent = nullptr);
 	~LightPresets() override;
 	[[nodiscard]] int getMaster() const;
@@ -29,6 +37,7 @@ public slots:
 	void showToggle();
 	void savePresets();
     void buildUp(const QJsonObject &source);
+	const QList<ButtonRow> &getButtonRows() const;
 
 private slots:
 	void timerChanged( int time );
@@ -57,6 +66,7 @@ private:
 	QMap<int, int> m_fadeStart;
 	QMap<int, int> m_fadeEnd;
     QString m_settingsFile;
+	QList <ButtonRow> m_buttonRows;
 
 	QTcpServer *m_tcpServer = nullptr;
 	QHttpServer m_httpServer;
