@@ -207,25 +207,23 @@ void Mediacenter::onCommitData(QSessionManager& sm)
 	if (sm.allowsInteraction() == false)
 	{
 #ifdef Q_OS_WIN
-		HWND hwnd = reinterpret_cast<HWND>(w->winId());
-		ShutdownBlockReasonCreateW(hwnd, L"Power is still on");
+		HWND hwnd = reinterpret_cast<HWND>(this->winId());
+		::ShutdownBlockReasonCreate(hwnd, L"Power is still on");
 		QTimer::singleShot(0, this, [this, checkedButtons]()
 		{
-			showTurnOffButtonsMessage(checkedButtons)
+			showTurnOffButtonsMessage(checkedButtons);
 		});
 
 		sm.cancel();
-		return;
 #endif
 	}
 	else
 	{
 #ifdef Q_OS_WIN
-		HWND hwnd = reinterpret_cast<HWND>(w->winId());
-		ShutdownBlockReasonCreateW(hwnd, L"Power is still on");
+		HWND hwnd = reinterpret_cast<HWND>(this->winId());
+		::ShutdownBlockReasonCreate(hwnd, L"Power is still on");
 		showTurnOffButtonsMessage(checkedButtons);
 		sm.cancel();
-		return;
 #endif
 	}
 }
@@ -247,10 +245,10 @@ void Mediacenter::showTurnOffButtonsMessage(const QStringList &checkedButtons) c
 			}
 		}
 
-		QTimer::singleShot(1000, this, []()
+		QTimer::singleShot(1000, this, [this]()
 		{
 #ifdef Q_OS_WIN
-			HWND hwnd = reinterpret_cast<HWND>(w->winId());
+			HWND hwnd = reinterpret_cast<HWND>(this->winId());
 			ShutdownBlockReasonDestroy(hwnd);
 			qApp->quit();
 #endif
