@@ -1,6 +1,7 @@
 #include "Mediacenter.h"
 #include <QSystemTrayIcon>
 #include <QApplication>
+#include <QCloseEvent>
 #include <QScreen>
 #include <QMessageBox>
 #include <QInputDialog>
@@ -71,7 +72,7 @@ Mediacenter::Mediacenter(QWidget *parent)
     m_systray = new QSystemTrayIcon(QIcon(QString("://off.xpm")), this);
     m_systray->show();
 
-	auto *menu = new QMenu(this);
+	auto *menu = new QMenu(this); //NOLINT (cppcoreguidelines-owning-memory) Memory is managed by Qt
 	menu->addAction( tr("Connect DMX"), this, &Mediacenter::connectDMX);
 	menu->addAction( tr("Disconnect DMX"), this, &Mediacenter::disconnectDMX);
 	menu->addSeparator();
@@ -85,7 +86,7 @@ Mediacenter::Mediacenter(QWidget *parent)
     //menu->addAction( tr("Configure DMX Channels"), configDMX, SLOT( show() ) );
     //menu->addAction( tr("Configure Beamer Connection"), this, SLOT( configureBeamer() ) );
 	menu->addSeparator();
-	menu->addAction( tr("Close"), qApp, &QCoreApplication::quit);
+	menu->addAction( tr("Close"), this, &Mediacenter::close);
 	
     m_systray->setContextMenu(menu);
 	connect(m_systray, &QSystemTrayIcon::activated, this, [this](QSystemTrayIcon::ActivationReason reason)
@@ -231,6 +232,49 @@ void Mediacenter::onCommitData(QSessionManager& sm)
 void Mediacenter::onSaveState(QSessionManager& sm)
 {
 	qDebug() << "onSaveState called";
+}
+
+void Mediacenter::closeEvent(QCloseEvent* event)
+{
+	QStringList checkedButtons;
+	for (const auto& row: m_lightPresets->getButtonRows())
+	{
+		if (row.offButton->isEnabled() == true && row.onButton->isEnabled() == false)
+		{
+			checkedButtons.append(row.name);
+		}
+	}
+
+	if (checkedButtons.isEmpty() == true)
+	{
+		QMainWindow::closeEvent(event);
+		return;
+	}
+
+	if (const auto button = QMessageBox::critical(nullptr, tr("Turn off buttons"), tr("The following buttons are still on:\n%1\nDo you want them to be turned off?").arg(checkedButtons.join("\n")), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel); button == QMessageBox::Yes)
+	{
+		for (const auto& [name, onButton, offButton]: m_lightPresets->getButtonRows())
+		{
+			if (checkedButtons.contains(name) == true)
+			{
+				emit offButton->clicked();
+			}
+		}
+		event->ignore();
+		QTimer::singleShot(1000, this, []()
+		{
+			qApp->quit();
+		});
+	}
+	else if (button == QMessageBox::No)
+	{
+		QMainWindow::closeEvent(event);
+		qApp->quit();
+	}
+	else
+	{
+		event->ignore();
+	}
 }
 
 void Mediacenter::showTurnOffButtonsMessage(const QStringList &checkedButtons) const

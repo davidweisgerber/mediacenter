@@ -19,6 +19,9 @@ public:
     explicit Mediacenter(QWidget *parent = nullptr);
 	~Mediacenter() override;
 
+protected:
+	void closeEvent(QCloseEvent* event) override;
+
 private slots:
 	void showAllControls();
 	void hideAllControls();
