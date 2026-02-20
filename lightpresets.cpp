@@ -510,7 +510,7 @@ void LightPresets::buildButtons(const QJsonObject& source)
 	constexpr int BUTTON_WIDTH = 100;
 	constexpr int BUTTONS_PER_COLUMN = 3;
 
-	const int numberOfColumns = std::ceil(buttonArray.size() / BUTTONS_PER_COLUMN);
+	const int numberOfColumns = std::ceil(static_cast<double>(buttonArray.size()) / static_cast<double>(BUTTONS_PER_COLUMN));
 	const int newWidth = width() + (numberOfColumns * BUTTON_WIDTH);
 	resize(newWidth, height());
 	setMinimumWidth(newWidth);
