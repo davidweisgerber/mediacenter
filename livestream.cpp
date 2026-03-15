@@ -95,7 +95,7 @@ void Livestream::youtubeAccessGranted()
 	settings.setValue("youtubeToken", m_oauth2->token());
 	settings.setValue("youtubeRefreshToken", m_oauth2->refreshToken());
 
-	auto reply = m_oauth2->get(QUrl("https://www.googleapis.com/youtube/v3/liveBroadcasts?part=snippet,contentDetails&broadcastStatus=upcoming"));
+	/*auto reply = m_oauth2->get(QUrl("https://www.googleapis.com/youtube/v3/liveBroadcasts?part=snippet,contentDetails&broadcastStatus=upcoming"));
 	connect(reply, &QNetworkReply::finished, this, [this, reply]
 	{
 		if (reply->error() != QNetworkReply::NoError)
@@ -107,6 +107,40 @@ void Livestream::youtubeAccessGranted()
 
 		youtubeListBroadcastsFinished(reply->readAll());
 		reply->deleteLater();
+	});*/
+
+	auto replyForStatus = m_oauth2->get(QUrl("https://www.googleapis.com/youtube/v3/liveBroadcasts?part=snippet,statistics&broadcastStatus=active"));
+	connect(replyForStatus, &QNetworkReply::finished, this, [this, replyForStatus]()
+	{
+		if (replyForStatus->error() != QNetworkReply::NoError)
+		{
+			qDebug() << "Error retrieving active broadcasts: " + replyForStatus->errorString();
+			replyForStatus->deleteLater();
+			return;
+		}
+
+		QJsonDocument document = QJsonDocument::fromJson(replyForStatus->readAll());
+		QJsonObject object = document.object();
+		QJsonArray items = object["items"].toArray();
+
+		if (items.isEmpty() == false)
+		{
+			qDebug() << "Active broadcasts found:";
+			for (const QJsonValueRef& itemValue : items)
+			{
+				QJsonObject item = itemValue.toObject();
+				QString title = item["snippet"].toObject()["title"].toString();
+				int concurrentViewers = item["statistics"].toObject()["concurrentViewers"].toInt(0);
+				qDebug() << "Title:" << title << "| Concurrent Viewers:" << concurrentViewers;
+			}
+			return;
+		}
+		else
+		{
+			qDebug() << "No active broadcasts found.";
+		}
+
+		replyForStatus->deleteLater();
 	});
 }
 
