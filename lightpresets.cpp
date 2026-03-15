@@ -569,6 +569,17 @@ void LightPresets::buildButtons(const QJsonObject& source)
 				auto *livestream = new Livestream(buttonObject, this); //NOLINT (cppcoreguidelines-owning-memory) Memory is managed by Qt
 				connect(buttonOn, &QPushButton::clicked, livestream, &Livestream::startStream);
 				connect(buttonOff, &QPushButton::clicked, livestream, &Livestream::stopStream);
+				connect(livestream, &Livestream::status, this, [label](bool running, int viewers)
+				{
+					if (running == false)
+					{
+						label->setText(tr("Livestream Off"));
+					}
+					else
+					{
+						label->setText(tr("⏺ Viewers: %1").arg(viewers));
+					}
+				});
 			}
 
 			m_buttonRows.append({.name = label->text(), .onButton = buttonOn, .offButton = buttonOff});

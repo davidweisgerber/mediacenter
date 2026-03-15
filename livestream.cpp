@@ -7,6 +7,7 @@
 #include <QNetworkReply>
 #include <QSettings>
 #include <QMessageBox>
+#include <QTimer>
 #include "livestream.h"
 
 #include <qguiapplication.h>
@@ -17,7 +18,12 @@ Livestream::Livestream(const QJsonObject& configurationObject, QObject *parent)
 {
 	m_atemAddress = configurationObject["atemAddress"].toString();
 	m_oauth2->setScope("https://www.googleapis.com/auth/youtube");
-	connect(m_oauth2, &QOAuth2AuthorizationCodeFlow::authorizeWithBrowser,&QDesktopServices::openUrl);
+    connect(m_oauth2, &QOAuth2AuthorizationCodeFlow::authorizeWithBrowser,[](const QUrl &url)
+	{
+	        qDebug() << url;
+	        QDesktopServices::openUrl(url);
+	});
+
 
 	QFile file("client_secret.json");
 	if (file.open(QIODevice::ReadOnly) == false)
@@ -49,6 +55,10 @@ Livestream::Livestream(const QJsonObject& configurationObject, QObject *parent)
 	{
 		liveStreamError("OAuth2 request failed: " + QString::number(static_cast<int>(error)));
 	});
+
+	m_statusTimer = new QTimer(this); //NOLINT Memory managed by Qt
+	connect(m_statusTimer, &QTimer::timeout, this, &Livestream::statusTimer);
+	m_statusTimer->setInterval(10000);
 }
 
 void Livestream::startStream()
@@ -95,7 +105,7 @@ void Livestream::youtubeAccessGranted()
 	settings.setValue("youtubeToken", m_oauth2->token());
 	settings.setValue("youtubeRefreshToken", m_oauth2->refreshToken());
 
-	/*auto reply = m_oauth2->get(QUrl("https://www.googleapis.com/youtube/v3/liveBroadcasts?part=snippet,contentDetails&broadcastStatus=upcoming"));
+	auto reply = m_oauth2->get(QUrl("https://www.googleapis.com/youtube/v3/liveBroadcasts?part=snippet,contentDetails&broadcastStatus=upcoming"));
 	connect(reply, &QNetworkReply::finished, this, [this, reply]
 	{
 		if (reply->error() != QNetworkReply::NoError)
@@ -107,40 +117,6 @@ void Livestream::youtubeAccessGranted()
 
 		youtubeListBroadcastsFinished(reply->readAll());
 		reply->deleteLater();
-	});*/
-
-	auto replyForStatus = m_oauth2->get(QUrl("https://www.googleapis.com/youtube/v3/liveBroadcasts?part=snippet,statistics&broadcastStatus=active"));
-	connect(replyForStatus, &QNetworkReply::finished, this, [this, replyForStatus]()
-	{
-		if (replyForStatus->error() != QNetworkReply::NoError)
-		{
-			qDebug() << "Error retrieving active broadcasts: " + replyForStatus->errorString();
-			replyForStatus->deleteLater();
-			return;
-		}
-
-		QJsonDocument document = QJsonDocument::fromJson(replyForStatus->readAll());
-		QJsonObject object = document.object();
-		QJsonArray items = object["items"].toArray();
-
-		if (items.isEmpty() == false)
-		{
-			qDebug() << "Active broadcasts found:";
-			for (const QJsonValueRef& itemValue : items)
-			{
-				QJsonObject item = itemValue.toObject();
-				QString title = item["snippet"].toObject()["title"].toString();
-				int concurrentViewers = item["statistics"].toObject()["concurrentViewers"].toInt(0);
-				qDebug() << "Title:" << title << "| Concurrent Viewers:" << concurrentViewers;
-			}
-			return;
-		}
-		else
-		{
-			qDebug() << "No active broadcasts found.";
-		}
-
-		replyForStatus->deleteLater();
 	});
 }
 
@@ -228,6 +204,43 @@ void Livestream::youtubeGetStreamFinished(const QByteArray& data)
 		tcpSocket->deleteLater();
 	});
 	tcpSocket->connectToHost(m_atemAddress, 9993);
+
+	m_statusTimer->start();
+}
+
+void Livestream::statusTimer()
+{
+	auto replyForStatus = m_oauth2->get(QUrl("https://www.googleapis.com/youtube/v3/liveBroadcasts?part=snippet,statistics&broadcastStatus=active"));
+	connect(replyForStatus, &QNetworkReply::finished, this, [this, replyForStatus]()
+	{
+		if (replyForStatus->error() != QNetworkReply::NoError)
+		{
+			qDebug() << "Error retrieving active broadcasts: " + replyForStatus->errorString();
+			replyForStatus->deleteLater();
+			return;
+		}
+
+		const QByteArray answer = replyForStatus->readAll();
+		const QJsonDocument document = QJsonDocument::fromJson(answer);
+		QJsonObject object = document.object();
+		QJsonArray items = object["items"].toArray();
+
+		if (items.isEmpty() == false)
+		{
+			QJsonObject item = items[0].toObject();
+			QString title = item["snippet"].toObject()["title"].toString();
+			int concurrentViewers = item["statistics"].toObject()["concurrentViewers"].toString().toInt();
+			qDebug() << "Title:" << title << "| Concurrent Viewers:" << concurrentViewers;
+
+			emit status(true, concurrentViewers);
+		}
+		else
+		{
+			emit status(false, 0);
+		}
+
+		replyForStatus->deleteLater();
+	});
 }
 
 void Livestream::liveStreamError(const QString& errorString)

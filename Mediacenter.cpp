@@ -18,6 +18,9 @@
 Mediacenter::Mediacenter(QWidget *parent)
     :QMainWindow(parent)
 {
+	qApp->setOrganizationName("fourconnected.de");
+	qApp->setApplicationName("Mediacenter");
+
 	connect(qApp, &QGuiApplication::commitDataRequest, this, &Mediacenter::onCommitData);
 	connect(qApp, &QGuiApplication::saveStateRequest, this, &Mediacenter::onSaveState);
 
@@ -248,7 +251,7 @@ void Mediacenter::closeEvent(QCloseEvent* event)
 	if (checkedButtons.isEmpty() == true)
 	{
 		QMainWindow::closeEvent(event);
-		return;
+		qApp->quit();
 	}
 
 	if (const auto button = QMessageBox::critical(nullptr, tr("Turn off buttons"), tr("The following buttons are still on:\n%1\nDo you want them to be turned off?").arg(checkedButtons.join("\n")), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel); button == QMessageBox::Yes)
